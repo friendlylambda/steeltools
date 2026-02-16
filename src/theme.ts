@@ -1,15 +1,17 @@
+const primary = '#acc2d7'     // steel (accent/headings)
+const secondary = '#c9b082'   // amber (UI chrome/borders)
+
 export const colors = {
   // Steel & Parchment theme
   background: '#0c1014',
   backgroundLight: '#141a20',
   backgroundCard: 'rgba(168, 180, 196, 0.05)',
 
-  primary: '#d4b478',
-  primaryLight: '#e4c898',
+  primary,
+  primaryLight: '#cedae8',
 
-  secondary: '#c2cdd8',
-  secondaryLight: '#dae0e8',
-  secondaryDim: '#96a4b4',
+  secondary,
+  secondaryLight: '#d5c5a4',
 
   text: '#dedad4',
   textDim: '#a8a49c',
@@ -18,12 +20,12 @@ export const colors = {
   danger: '#c75050',
 
   // Derived (for borders, subtle backgrounds)
-  primary10: 'color-mix(in srgb, #d4b478 10%, transparent)',
-  primary20: 'color-mix(in srgb, #d4b478 20%, transparent)',
-  primary30: 'color-mix(in srgb, #d4b478 30%, transparent)',
-  secondary10: 'color-mix(in srgb, #c2cdd8 10%, transparent)',
-  secondary20: 'color-mix(in srgb, #c2cdd8 20%, transparent)',
-  secondary30: 'color-mix(in srgb, #c2cdd8 30%, transparent)',
+  primary10: `color-mix(in srgb, ${primary} 10%, transparent)`,
+  primary20: `color-mix(in srgb, ${primary} 20%, transparent)`,
+  primary30: `color-mix(in srgb, ${primary} 30%, transparent)`,
+  secondary10: `color-mix(in srgb, ${secondary} 10%, transparent)`,
+  secondary20: `color-mix(in srgb, ${secondary} 20%, transparent)`,
+  secondary30: `color-mix(in srgb, ${secondary} 30%, transparent)`,
 } as const
 
 export const spacing = {

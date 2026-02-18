@@ -98,7 +98,7 @@ export const useMontageStore = create<MontageStore>()(
     }),
     {
       name: "montagemaker-store",
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
         let state = persistedState as { montages: Record<string, unknown> }
 
@@ -135,6 +135,28 @@ export const useMontageStore = create<MontageStore>()(
                   ...typedMontage,
                   outcomesMode: typedMontage.includeDetailedOutcomes ? "default" : "minimal",
                   customOutcomesHtml: "",
+                },
+              ]
+            }),
+          )
+          state = { ...state, montages: migratedMontages }
+        }
+
+        if (version < 3) {
+          // Add hidden field to challenges
+          const migratedMontages = Object.fromEntries(
+            Object.entries(state.montages).map(([id, montage]) => {
+              const typedMontage = montage as {
+                challenges?: Array<{ hidden?: boolean }>
+              }
+              return [
+                id,
+                {
+                  ...typedMontage,
+                  challenges: (typedMontage.challenges ?? []).map((challenge) => ({
+                    ...challenge,
+                    hidden: challenge.hidden ?? false,
+                  })),
                 },
               ]
             }),

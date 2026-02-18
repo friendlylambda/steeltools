@@ -5,6 +5,7 @@ import { startCase } from "lodash-es"
 import { Input } from "@base-ui/react/input"
 import { Combobox } from "@base-ui/react/combobox"
 import { Dialog } from "@base-ui/react/dialog"
+import { Switch } from "@base-ui/react/switch"
 import type { Challenge, Characteristic, Difficulty } from "../types/montage"
 import { CHARACTERISTICS, SKILLS } from "../constants/drawSteel"
 import { colors, spacing, radius, typography } from "../../theme"
@@ -239,31 +240,82 @@ export const ChallengeEditor = ({
         backgroundColor: colors.backgroundCard,
       }}
     >
-      {/* Delete button with confirmation dialog */}
-      <Dialog.Root open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <Dialog.Trigger
+      {/* Visibility toggle + delete button */}
+      <div
+        css={{
+          position: "absolute",
+          top: spacing.small,
+          right: spacing.small,
+          display: "flex",
+          alignItems: "center",
+          gap: spacing.small,
+        }}
+      >
+        <label
           css={{
-            position: "absolute",
-            top: spacing.small,
-            right: spacing.small,
-            padding: spacing.xsmall,
-            border: "none",
-            backgroundColor: "transparent",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: spacing.xsmall,
+            fontSize: typography.fontSize.small,
             color: colors.textDim,
             cursor: "pointer",
-            borderRadius: radius.small,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            "&:hover": {
-              color: colors.text,
-              backgroundColor: colors.secondary30,
-            },
+            userSelect: "none",
           }}
-          title="Delete challenge"
         >
-          <TrashIcon />
-        </Dialog.Trigger>
+          <span>Visible to Players</span>
+          <Switch.Root
+            checked={!value.hidden}
+            onCheckedChange={(checked) => onChange({ ...value, hidden: !checked })}
+            css={{
+              width: 32,
+              height: 18,
+              padding: 2,
+              borderRadius: 9,
+              border: "none",
+              backgroundColor: colors.secondary30,
+              cursor: "pointer",
+              transition: "background-color 0.15s ease",
+              "&[data-checked]": {
+                backgroundColor: colors.primary,
+              },
+            }}
+          >
+            <Switch.Thumb
+              css={{
+                display: "block",
+                width: 14,
+                height: 14,
+                borderRadius: "50%",
+                backgroundColor: colors.text,
+                transition: "transform 0.15s ease",
+                "&[data-checked]": {
+                  transform: "translateX(14px)",
+                },
+              }}
+            />
+          </Switch.Root>
+        </label>
+        <Dialog.Root open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <Dialog.Trigger
+            css={{
+              padding: spacing.xsmall,
+              border: "none",
+              backgroundColor: "transparent",
+              color: colors.textDim,
+              cursor: "pointer",
+              borderRadius: radius.small,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              "&:hover": {
+                color: colors.text,
+                backgroundColor: colors.secondary30,
+              },
+            }}
+            title="Delete challenge"
+          >
+            <TrashIcon />
+          </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Backdrop
             css={{
@@ -349,6 +401,7 @@ export const ChallengeEditor = ({
           </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>
+      </div>
       {/* Name & Description row */}
       <div css={{ display: "flex", gap: spacing.medium, marginBottom: spacing.medium }}>
         <div css={{ flex: "0 0 30%" }}>

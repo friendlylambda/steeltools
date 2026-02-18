@@ -21,6 +21,7 @@ export interface Challenge {
   readonly difficulty: Difficulty
   readonly extraDetails: string | null
   readonly timesCompletable: number
+  readonly hidden: boolean
 }
 
 export interface Montage {

@@ -240,7 +240,15 @@ const generateChallenges = (montage: Montage): string => {
     return ""
   }
   const includeRollButtons = montage.includeRollButtons ?? false
-  return montage.challenges.map((c) => generateChallenge(c, includeRollButtons)).join("\n\n")
+  return montage.challenges
+    .map((challenge) => {
+      const challengeMarkdown = generateChallenge(challenge, includeRollButtons)
+      if (challenge.hidden) {
+        return `${VISIBLE_WRAPPER_OPEN}\n${challengeMarkdown}\n}`
+      }
+      return challengeMarkdown
+    })
+    .join("\n\n")
 }
 
 const generatePlayerTracker = (): string => dedent`

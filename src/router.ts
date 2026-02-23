@@ -7,6 +7,7 @@ import { RootLayout } from './routes/RootLayout'
 import { HomePage } from './routes/HomePage'
 import { SplashScreen } from './montagemaker/components/SplashScreen'
 import { Editor } from './montagemaker/components/Editor'
+import { PortraitMaker } from './portraitmaker/components/PortraitMaker'
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -30,10 +31,17 @@ const montageEditorRoute = createRoute({
   component: Editor,
 })
 
+const portraitMakerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/popout-avatar-maker',
+  component: PortraitMaker,
+})
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   montageListRoute,
   montageEditorRoute,
+  portraitMakerRoute,
 ])
 
 export const router = createRouter({ routeTree })

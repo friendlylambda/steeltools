@@ -53,6 +53,37 @@ export const HomePage = (): React.ReactElement => (
           </div>
         </Link>
       </li>
+      <li css={{ marginTop: spacing.medium }}>
+        <Link
+          to="/popout-avatar-maker"
+          css={{
+            display: "block",
+            padding: spacing.large,
+            backgroundColor: colors.backgroundCard,
+            borderRadius: radius.medium,
+            border: `1px solid ${colors.secondary30}`,
+            textDecoration: "none",
+            color: colors.text,
+            "&:hover": {
+              borderColor: colors.primary30,
+              backgroundColor: "rgba(168, 180, 196, 0.08)",
+            },
+          }}
+        >
+          <div css={{ fontSize: typography.fontSize.large, color: colors.primary }}>
+            Popout Avatar Maker
+          </div>
+          <div
+            css={{
+              fontSize: typography.fontSize.small,
+              color: colors.textDim,
+              marginTop: spacing.small,
+            }}
+          >
+            Create popout avatar images that go beyond their token rings! Works great with both Draw Steel Codex VTT and other VTTs.
+          </div>
+        </Link>
+      </li>
     </ul>
   </div>
 )

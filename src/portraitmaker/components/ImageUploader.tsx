@@ -70,8 +70,11 @@ export const ImageUploader = ({ onFileSelected }: ImageUploaderProps): React.Rea
       <div css={{ fontSize: typography.fontSize.large, color: colors.textDim, marginBottom: spacing.small }}>
         Drop an image here
       </div>
-      <div css={{ fontSize: typography.fontSize.small, color: colors.textDim }}>
+      <div css={{ fontSize: typography.fontSize.small, color: colors.textDim, marginBottom: spacing.medium }}>
         or click to browse
+      </div>
+      <div css={{ fontSize: typography.fontSize.small, color: colors.textDim, opacity: 0.7, textAlign: 'center', padding: `0 ${spacing.large}` }}>
+        Use a PNG with a transparent background for best results
       </div>
       <input
         ref={inputRef}

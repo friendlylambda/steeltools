@@ -117,7 +117,12 @@ export const PortraitMaker = (): React.ReactElement => {
           </div>
         </>
       ) : (
-        <ImageUploader onFileSelected={handleFileSelected} />
+        <>
+          <ImageUploader onFileSelected={handleFileSelected} />
+          <p css={{ color: colors.textDim, margin: 0, textAlign: 'center', lineHeight: 1.5, maxWidth: 600, fontStyle: 'italic' }}>
+            Tip: For best results, remove your image's background first. On macOS, right-click an image in Finder and use Quick Actions &gt; Remove Background. On Windows 11, open the image in Paint and click Remove Background.
+          </p>
+        </>
       )}
     </div>
   )

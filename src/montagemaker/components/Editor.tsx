@@ -17,9 +17,10 @@ import type {
 } from "../types/montage"
 import { DEFAULT_OUTCOMES_HTML } from "../constants/outcomes"
 import { colors, spacing, radius, typography } from "../../theme"
+import { toggleButtonStyle, toggleGroupStyle } from "./sharedStyles"
 
 export const Editor = (): React.ReactElement | null => {
-  const { montageId } = useParams({ from: '/montagemaker/$montageId' })
+  const { montageId } = useParams({ from: "/montagemaker/$montageId" })
   const navigate = useNavigate()
   const montages = useMontageStore((state) => state.montages)
   const updateMontage = useMontageStore((state) => state.updateMontage)
@@ -29,7 +30,7 @@ export const Editor = (): React.ReactElement | null => {
 
   useEffect(() => {
     if (!montage) {
-      navigate({ to: '/montagemaker' })
+      navigate({ to: "/montagemaker" })
     } else {
       setCurrentId(montageId)
     }
@@ -140,7 +141,14 @@ export const Editor = (): React.ReactElement | null => {
         </div>
       </section>
 
-      <DifficultyTable value={montage.difficultyTable} onChange={handleDifficultyTableChange} />
+      <DifficultyTable
+        value={montage.difficultyTable}
+        onChange={handleDifficultyTableChange}
+        difficulty={montage.difficulty}
+        heroCount={montage.heroCount}
+        onDifficultyChange={(difficulty) => updateMontage(montageId, { difficulty })}
+        onHeroCountChange={(heroCount) => updateMontage(montageId, { heroCount })}
+      />
 
       <ChallengesList value={montage.challenges} onChange={handleChallengesChange} />
 
@@ -263,76 +271,13 @@ export const Editor = (): React.ReactElement | null => {
             <ToggleGroup
               value={[montage.outcomesMode]}
               onValueChange={handleOutcomesModeChange}
-              css={{
-                display: "flex",
-                gap: 0,
-                border: `1px solid ${colors.secondary}`,
-                borderRadius: radius.small,
-                overflow: "hidden",
-              }}
+              css={toggleGroupStyle}
             >
-              <Toggle
-                value="default"
-                css={{
-                  padding: `${spacing.small} ${spacing.medium}`,
-                  border: "none",
-                  borderRight: `1px solid ${colors.secondary}`,
-                  backgroundColor: "transparent",
-                  color: colors.secondary,
-                  fontSize: typography.fontSize.small,
-                  cursor: "pointer",
-                  "&[data-pressed]": {
-                    backgroundColor: colors.secondary30,
-                    color: colors.text,
-                  },
-                  "&:hover:not([data-pressed])": {
-                    backgroundColor: colors.backgroundCard,
-                  },
-                }}
-              >
-                Default
-              </Toggle>
-              <Toggle
-                value="minimal"
-                css={{
-                  padding: `${spacing.small} ${spacing.medium}`,
-                  border: "none",
-                  borderRight: `1px solid ${colors.secondary}`,
-                  backgroundColor: "transparent",
-                  color: colors.secondary,
-                  fontSize: typography.fontSize.small,
-                  cursor: "pointer",
-                  "&[data-pressed]": {
-                    backgroundColor: colors.secondary30,
-                    color: colors.text,
-                  },
-                  "&:hover:not([data-pressed])": {
-                    backgroundColor: colors.backgroundCard,
-                  },
-                }}
-              >
-                Minimal
-              </Toggle>
-              <Toggle
-                value="custom"
-                css={{
-                  padding: `${spacing.small} ${spacing.medium}`,
-                  border: "none",
-                  backgroundColor: "transparent",
-                  color: colors.secondary,
-                  fontSize: typography.fontSize.small,
-                  cursor: "pointer",
-                  "&[data-pressed]": {
-                    backgroundColor: colors.secondary30,
-                    color: colors.text,
-                  },
-                  "&:hover:not([data-pressed])": {
-                    backgroundColor: colors.backgroundCard,
-                  },
-                }}
-              >
-                Custom
-              </Toggle>
+              {(["default", "minimal", "custom"] as const).map((val, index, arr) => (
+                <Toggle key={val} value={val} css={toggleButtonStyle(index === arr.length - 1)}>
+                  {val.charAt(0).toUpperCase() + val.slice(1)}
+                </Toggle>
+              ))}
             </ToggleGroup>
           </div>
           {montage.outcomesMode === "custom" && (

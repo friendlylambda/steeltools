@@ -35,6 +35,8 @@ export interface Montage {
   readonly includeRollButtons: boolean
   readonly outcomesMode: OutcomesMode
   readonly customOutcomesHtml: string
+  readonly difficulty: Difficulty | null
+  readonly heroCount: HeroCount | null
   readonly createdAt: number
   readonly updatedAt: number
 }

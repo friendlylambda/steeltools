@@ -131,42 +131,86 @@ const heroCountLabels: Record<HeroCount, string> = {
   six: "Six",
 }
 
+const difficultyLabels: Record<Difficulty, string> = {
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
+}
+
 const generateDashes = (count: number): string => "-".repeat(count)
 
 const generateTable = (montage: Montage): string => {
   const { difficultyTable } = montage
+  const difficulties = montage.difficulty ? [montage.difficulty] : difficultyOrder
+  const heroCounts = montage.heroCount ? [montage.heroCount] : heroCountOrder
+
+  // Build header row
+  const difficultyHeaders = difficulties
+    .map((currentDifficulty) => `**${difficultyLabels[currentDifficulty]}**||`)
+    .join("")
+  const difficultySubHeaders = difficulties.map(() => "**Success**|**Failure**|").join("")
+
   const lines: string[] = [
     "**Montage Test Difficulty**",
-    "|**Heroes**|**Easy**||**Medium**||**Hard**||",
-    "|**Limits**|**Success**|**Failure**|**Success**|**Failure**|**Success**|**Failure**|",
+    `|**Heroes**|${difficultyHeaders}`,
+    `|**Limits**|${difficultySubHeaders}`,
   ]
 
-  for (const heroCount of heroCountOrder) {
-    const row = difficultyTable[heroCount]
-    lines.push(
-      `|**${heroCountLabels[heroCount]}**|${row.easy.success}|${row.easy.failure}|${row.medium.success}|${row.medium.failure}|${row.hard.success}|${row.hard.failure}|`,
-    )
+  for (const currentHeroCount of heroCounts) {
+    const row = difficultyTable[currentHeroCount]
+    const cells = difficulties
+      .map(
+        (currentDifficulty) =>
+          `${row[currentDifficulty].success}|${row[currentDifficulty].failure}|`,
+      )
+      .join("")
+    lines.push(`|**${heroCountLabels[currentHeroCount]}**|${cells}`)
   }
 
   return lines.join("\n")
 }
 
-const generateButtons = (): string => dedent`
-  ||[[setting:Number of Heroes]]||
-  ||Difficulty:||:<>[[/setvar montage_difficulty 1|Easy]][[/setvar montage_difficulty 2|Medium]][[/setvar montage_difficulty 3|Hard]]||`
+const generateButtons = (montage: Montage): string => {
+  const parts: string[] = []
 
-const generateQueryBlock = (
-  difficultyNum: number,
-  heroCondition: string,
-  successCount: number,
-  failureCount: number,
-): string => dedent`
-  ???query (montage_difficulty = ${difficultyNum}) and (${heroCondition})
+  if (!montage.heroCount) {
+    parts.push("||[[setting:Number of Heroes]]||")
+  }
+
+  if (!montage.difficulty) {
+    parts.push(
+      "||Difficulty:||:<>[[/setvar montage_difficulty 1|Easy]][[/setvar montage_difficulty 2|Medium]][[/setvar montage_difficulty 3|Hard]]||",
+    )
+  }
+
+  return parts.join("\n")
+}
+
+const generateTracker = (successCount: number, failureCount: number): string => dedent`
   |Successes: |[[${generateDashes(successCount)}]]|
   |||
   |Failures: |[[${generateDashes(failureCount)}]]|
-  |||
-  ???`
+  |||`
+
+const generateQueryBlock = (
+  conditions: readonly string[],
+  successCount: number,
+  failureCount: number,
+): string => {
+  const tracker = generateTracker(successCount, failureCount)
+
+  if (conditions.length === 0) {
+    return tracker
+  }
+
+  const query =
+    conditions.length === 1 ? conditions[0] : conditions.map((cond) => `(${cond})`).join(" and ")
+
+  return dedent`
+    ???query ${query}
+    ${tracker}
+    ???`
+}
 
 const generateQueryBlocks = (montage: Montage): string => {
   const { difficultyTable } = montage
@@ -178,19 +222,24 @@ const generateQueryBlocks = (montage: Montage): string => {
     six: "numheroes > 5",
   }
 
+  const difficulties = montage.difficulty ? [montage.difficulty] : difficultyOrder
+  const heroCounts = montage.heroCount ? [montage.heroCount] : heroCountOrder
+
   const blocks: string[] = []
 
-  for (const difficulty of difficultyOrder) {
-    for (const heroCount of heroCountOrder) {
-      const cell = difficultyTable[heroCount][difficulty]
-      blocks.push(
-        generateQueryBlock(
-          difficultyNumMap[difficulty],
-          heroConditionMap[heroCount],
-          cell.success,
-          cell.failure,
-        ),
-      )
+  for (const currentDifficulty of difficulties) {
+    for (const currentHeroCount of heroCounts) {
+      const cell = difficultyTable[currentHeroCount][currentDifficulty]
+      const conditions: string[] = []
+
+      if (!montage.difficulty) {
+        conditions.push(`montage_difficulty = ${difficultyNumMap[currentDifficulty]}`)
+      }
+      if (!montage.heroCount) {
+        conditions.push(heroConditionMap[currentHeroCount])
+      }
+
+      blocks.push(generateQueryBlock(conditions, cell.success, cell.failure))
     }
   }
 
@@ -200,7 +249,6 @@ const generateQueryBlocks = (montage: Montage): string => {
 const generateChallenge = (challenge: Challenge, includeRollButtons: boolean): string => {
   const chars = challenge.suggestedCharacteristics.join(" or ")
   const skills = challenge.suggestedSkills.join(" or ")
-  const diffLabel = challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1)
   const extraDetails = challenge.extraDetails?.trim()
   const checkboxCount = challenge.timesCompletable ?? 1
   const checkboxes = Array(checkboxCount)
@@ -225,14 +273,24 @@ const generateChallenge = (challenge: Challenge, includeRollButtons: boolean): s
 
   if (!includeRollButtons) {
     return base
-  } else {
-    return dedent`
-      ${base}
-      {
-      |Roll for: ${challenge.name}
-      |${diffLabel}
-      }`
   }
+
+  // Build roll button label: "{name}: {chars} ({skills})"
+  const rollParts = [challenge.name]
+  if (chars) {
+    rollParts.push(`: ${chars}`)
+  }
+  const rollLabel = rollParts.join("")
+  const skillsSuffix = skills ? ` (${skills})` : ""
+
+  const difficultyKeyword = difficultyLabels[challenge.difficulty]
+
+  return dedent`
+    ${base}
+    {
+    |${rollLabel}${skillsSuffix}
+    |${difficultyKeyword}
+    }`
 }
 
 const generateChallenges = (montage: Montage): string => {
@@ -307,22 +365,22 @@ export const generateMarkdown = (montage: Montage): string => {
     }
   }
 
+  const bothLocked = montage.difficulty !== null && montage.heroCount !== null
+  const buttons = generateButtons(montage)
+
   // Party section
-  sections.push(
-    "",
-    "## Party",
-    "",
-    "{",
-    generateTable(montage),
-    "",
-    "",
-    generateButtons(),
-    "}",
-    "",
-    "{!",
-    generateQueryBlocks(montage),
-    "}",
-  )
+  sections.push("", "## Party", "")
+
+  if (bothLocked && !buttons) {
+    // Both set: table in { } with no buttons, query blocks have no wrapper
+    sections.push("{", generateTable(montage), "}", "", "{!", generateQueryBlocks(montage), "}")
+  } else {
+    sections.push("{", generateTable(montage), "")
+    if (buttons) {
+      sections.push("", buttons)
+    }
+    sections.push("}", "", "{!", generateQueryBlocks(montage), "}")
+  }
 
   if (montage.includePlayerTracker) {
     sections.push("", generatePlayerTracker())

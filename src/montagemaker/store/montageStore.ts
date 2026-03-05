@@ -23,6 +23,8 @@ interface MontageStore {
         | "includeRollButtons"
         | "outcomesMode"
         | "customOutcomesHtml"
+        | "difficulty"
+        | "heroCount"
       >
     >,
   ) => void
@@ -56,6 +58,8 @@ export const useMontageStore = create<MontageStore>()(
           includeRollButtons: false,
           outcomesMode: "minimal",
           customOutcomesHtml: "",
+          difficulty: "medium",
+          heroCount: "four",
           createdAt: now,
           updatedAt: now,
         }
@@ -98,7 +102,7 @@ export const useMontageStore = create<MontageStore>()(
     }),
     {
       name: "montagemaker-store",
-      version: 3,
+      version: 4,
       migrate: (persistedState, version) => {
         let state = persistedState as { montages: Record<string, unknown> }
 
@@ -160,6 +164,21 @@ export const useMontageStore = create<MontageStore>()(
                 },
               ]
             }),
+          )
+          state = { ...state, montages: migratedMontages }
+        }
+
+        if (version < 4) {
+          // Add difficulty and heroCount fields
+          const migratedMontages = Object.fromEntries(
+            Object.entries(state.montages).map(([id, montage]) => [
+              id,
+              {
+                ...(montage as Record<string, unknown>),
+                difficulty: null,
+                heroCount: null,
+              },
+            ]),
           )
           state = { ...state, montages: migratedMontages }
         }

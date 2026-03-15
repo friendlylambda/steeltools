@@ -9,7 +9,7 @@ import { Switch } from "@base-ui/react/switch"
 import type { Challenge, Characteristic, Difficulty } from "../types/montage"
 import { CHARACTERISTICS, SKILLS } from "../constants/drawSteel"
 import { colors, spacing, radius, typography } from "../../theme"
-import { Stepper } from "./Stepper"
+import { Stepper } from "../../components/Stepper"
 
 const CheckIcon = (): React.ReactElement => (
   <svg fill="currentColor" width="10" height="10" viewBox="0 0 10 10">

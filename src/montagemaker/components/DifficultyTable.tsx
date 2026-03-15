@@ -8,7 +8,7 @@ import type {
   Difficulty,
 } from "../types/montage"
 import { colors, spacing, typography } from "../../theme"
-import { Stepper } from "./Stepper"
+import { Stepper } from "../../components/Stepper"
 import { toggleButtonStyle, toggleGroupStyle } from "./sharedStyles"
 
 interface CellProps {

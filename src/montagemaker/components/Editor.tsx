@@ -5,11 +5,11 @@ import { Switch } from "@base-ui/react/switch"
 import { Toggle } from "@base-ui/react/toggle"
 import { ToggleGroup } from "@base-ui/react/toggle-group"
 import { useMontageStore } from "../store/montageStore"
-import { TitleInput } from "./TitleInput"
+import { TitleInput } from "../../components/TitleInput"
 import { DifficultyTable } from "./DifficultyTable"
 import { ChallengesList } from "./ChallengesList"
 import { ExportActions } from "./ExportActions"
-import { RichTextEditor } from "./RichTextEditor"
+import { RichTextEditor } from "../../components/RichTextEditor"
 import type {
   DifficultyTable as DifficultyTableType,
   Challenge,
@@ -121,7 +121,7 @@ export const Editor = (): React.ReactElement | null => {
         >
           Basic Details
         </h3>
-        <TitleInput value={montage.title} onChange={handleTitleChange} />
+        <TitleInput value={montage.title} onChange={handleTitleChange} label="Montage Title" placeholder="Enter montage title..." />
         <div>
           <label
             css={{

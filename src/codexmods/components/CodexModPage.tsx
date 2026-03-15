@@ -42,8 +42,12 @@ export const CodexModPage = (): React.ReactElement => {
           color: colors.primary,
           marginTop: spacing.large,
           marginBottom: spacing.small,
+          display: "flex",
+          alignItems: "center",
+          gap: spacing.medium,
         }}
       >
+        <img src={mod.icon} alt="" css={{ width: 56, height: "auto" }} />
         {mod.name}
       </h1>
 

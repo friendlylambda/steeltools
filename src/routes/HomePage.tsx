@@ -85,18 +85,29 @@ export const HomePage = (): React.ReactElement => (
         <ul css={{ listStyle: "none", padding: 0, margin: 0 }}>
           {codexMods.map((mod) => (
             <li key={modSlug(mod)} css={{ marginTop: spacing.medium }}>
-              <Link to="/codex-mods/$modSlug" params={{ modSlug: modSlug(mod) }} css={cardStyle}>
-                <div css={{ fontSize: typography.fontSize.large, color: colors.primary }}>
-                  {mod.name}
-                </div>
-                <div
-                  css={{
-                    fontSize: typography.fontSize.small,
-                    color: colors.textDim,
-                    marginTop: spacing.small,
-                  }}
-                >
-                  {mod.description}
+              <Link
+                to="/codex-mods/$modSlug"
+                params={{ modSlug: modSlug(mod) }}
+                css={{ ...cardStyle, display: "flex", alignItems: "flex-start", gap: spacing.medium }}
+              >
+                <img
+                  src={mod.icon}
+                  alt=""
+                  css={{ width: 56, height: "auto", flexShrink: 0, marginTop: 2 }}
+                />
+                <div>
+                  <div css={{ fontSize: typography.fontSize.large, color: colors.primary }}>
+                    {mod.name}
+                  </div>
+                  <div
+                    css={{
+                      fontSize: typography.fontSize.small,
+                      color: colors.textDim,
+                      marginTop: spacing.small,
+                    }}
+                  >
+                    {mod.description}
+                  </div>
                 </div>
               </Link>
             </li>

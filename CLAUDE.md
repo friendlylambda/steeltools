@@ -42,6 +42,24 @@ Montages consist of:
 - A difficulty table (success/failure limits by hero count and difficulty level)
 - A list of challenges (name, description, suggested characteristics, suggested skills, default difficulty)
 
+### Negotiation Maker
+
+Generates negotiation documents for Draw Steel NPC negotiations. Outputs Codex VTT markdown with NPC stats, motivations/pitfalls (as revealable GM-only blocks), outcomes tables, and optional rules reference tables.
+
+Negotiations consist of:
+- NPC stats (impression, native language, starting interest/patience)
+- Motivations (from 12 standard presets or custom, each in a separate hidden block)
+- Pitfalls (same structure as motivations)
+- Outcomes table (6 fixed rows: Interest 5 "Yes, and..." through Interest 0 "No, and...")
+
+## Shared Components
+
+Generic UI components live in `src/components/` and are imported by multiple tools:
+- `TitleInput` — debounced text input with configurable label/placeholder
+- `Stepper` — +/- number input with optional min/max
+- `RichTextEditor` — Tiptap WYSIWYG with hidden blocks, bold/italic/lists, optional victory buttons
+- `ExportActions` — copy-to-clipboard and download-as-file with configurable labels
+
 ## Testing & Verification
 
 - Dev server runs perpetually (user manages it). Use Chrome DevTools MCP for browser-based verification.

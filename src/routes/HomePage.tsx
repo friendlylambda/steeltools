@@ -54,6 +54,22 @@ export const HomePage = (): React.ReactElement => (
         </Link>
       </li>
       <li css={{ marginTop: spacing.medium }}>
+        <Link to="/negotiation-maker" css={cardStyle}>
+          <div css={{ fontSize: typography.fontSize.large, color: colors.primary }}>
+            Codex Negotiation Maker
+          </div>
+          <div
+            css={{
+              fontSize: typography.fontSize.small,
+              color: colors.textDim,
+              marginTop: spacing.small,
+            }}
+          >
+            Generate negotiation documents that you can paste directly into Draw Steel Codex VTT.
+          </div>
+        </Link>
+      </li>
+      <li css={{ marginTop: spacing.medium }}>
         <Link to="/popout-avatar-maker" css={cardStyle}>
           <div css={{ fontSize: typography.fontSize.large, color: colors.primary }}>
             Popout Avatar Maker
@@ -65,7 +81,8 @@ export const HomePage = (): React.ReactElement => (
               marginTop: spacing.small,
             }}
           >
-            Create popout avatar images that go beyond their token rings! Works great with both Draw Steel Codex VTT and other VTTs.
+            Create popout avatar images that go beyond their token rings! Works great with both Draw
+            Steel Codex VTT and other VTTs.
           </div>
         </Link>
       </li>
@@ -88,7 +105,12 @@ export const HomePage = (): React.ReactElement => (
               <Link
                 to="/codex-mods/$modSlug"
                 params={{ modSlug: modSlug(mod) }}
-                css={{ ...cardStyle, display: "flex", alignItems: "flex-start", gap: spacing.medium }}
+                css={{
+                  ...cardStyle,
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: spacing.medium,
+                }}
               >
                 <img
                   src={mod.icon}

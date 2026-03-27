@@ -11,6 +11,9 @@ import safetyCards3 from "./images/safety-cards/3.png"
 import breakTimeIcon from "./images/break-time/icon.png"
 import countdownTimersIcon from "./images/countdown-timers/icon.png"
 import safetyCardsIcon from "./images/safety-cards/icon.png"
+import clocks1 from "./images/clocks/1.png"
+import clocks2 from "./images/clocks/2.png"
+import clocksIcon from "./images/clocks/icon.png"
 
 /**
  * Add your Codex Mods here. Each entry automatically gets its own
@@ -31,6 +34,13 @@ export const codexMods: readonly CodexMod[] = [
       "This module allows you to create simple countdown timers that you can then trigger/clear with a click.",
     icon: countdownTimersIcon,
     images: [timersList, timerEdit, timerRunning],
+  },
+  {
+    name: "Clocks",
+    description:
+      "Adds a panel that lets the Director create Blades in the Dark style clocks to track various counters in the game. Click + to add a clock (defaults to 3 segments). Left click a clock's image to fill a segment, right click to remove one. Click a clock's name to edit its name and number of segments or delete it. Toggle the eye icon to switch between director-only and player-visible.",
+    icon: clocksIcon,
+    images: [clocks1, clocks2],
   },
   {
     name: "Safety Cards",

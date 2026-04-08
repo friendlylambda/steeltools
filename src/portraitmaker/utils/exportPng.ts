@@ -22,3 +22,25 @@ export const downloadPortraitPng = (
     URL.revokeObjectURL(url)
   }, 'image/png')
 }
+
+/**
+ * Render the portrait to an offscreen canvas and trigger a WebP download.
+ */
+export const downloadPortraitWebp = (
+  image: HTMLImageElement,
+  transform: Transform,
+  arc: Arc,
+): void => {
+  const canvas = renderExport(image, transform, arc)
+
+  canvas.toBlob((blob) => {
+    if (!blob) return
+
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = 'popout-portrait.webp'
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }, 'image/webp')
+}

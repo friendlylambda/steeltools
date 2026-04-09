@@ -13,6 +13,7 @@
   "dependencies": {
     "@base-ui/react": "^1.2.0",
     "@emotion/react": "^11.14.0",
+    "@huggingface/transformers": "^4.0.1",
     "@tanstack/react-router": "^1.160.0",
     "@tiptap/core": "^3.19.0",
     "@tiptap/pm": "^3.19.0",

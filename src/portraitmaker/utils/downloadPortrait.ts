@@ -8,8 +8,9 @@ export const downloadPortraitPng = (
   image: HTMLImageElement,
   transform: Transform,
   arc: Arc,
+  hasExtraPopoutRoom: boolean,
 ): void => {
-  const canvas = renderExport(image, transform, arc)
+  const canvas = renderExport(image, transform, arc, hasExtraPopoutRoom)
 
   canvas.toBlob((blob) => {
     if (!blob) return
@@ -30,8 +31,9 @@ export const downloadPortraitWebp = (
   image: HTMLImageElement,
   transform: Transform,
   arc: Arc,
+  hasExtraPopoutRoom: boolean,
 ): void => {
-  const canvas = renderExport(image, transform, arc)
+  const canvas = renderExport(image, transform, arc, hasExtraPopoutRoom)
 
   canvas.toBlob((blob) => {
     if (!blob) return

@@ -1,24 +1,22 @@
 import {
-  CANVAS_SIZE,
   RING_INNER_RADIUS,
   RING_OUTER_RADIUS,
   VTT_OFFSET_X,
   VTT_OFFSET_Y,
+  getCanvasSize,
   type Transform,
   type Arc,
 } from '../types/portrait'
 import { createMaskPath } from './geometry'
-
-const CENTER = CANVAS_SIZE / 2
 
 /**
  * Draw the full token ring as a complete circle. In the preview this is
  * rendered BEFORE the clipped image so the character visibly pops over
  * the ring in the arc region — matching how it looks on a VTT token.
  */
-const drawTokenRing = (ctx: CanvasRenderingContext2D): void => {
+const drawTokenRing = (ctx: CanvasRenderingContext2D, center: number): void => {
   // Conic gradient for metallic sheen — highlights rotate around the ring
-  const conic = ctx.createConicGradient(0, CENTER, CENTER)
+  const conic = ctx.createConicGradient(0, center, center)
   conic.addColorStop(0, '#b0b0b0')
   conic.addColorStop(0.15, '#e8e8e8')
   conic.addColorStop(0.3, '#a0a0a0')
@@ -29,8 +27,8 @@ const drawTokenRing = (ctx: CanvasRenderingContext2D): void => {
 
   // Radial gradient for inner bevel / depth
   const radial = ctx.createRadialGradient(
-    CENTER, CENTER, RING_INNER_RADIUS,
-    CENTER, CENTER, RING_OUTER_RADIUS,
+    center, center, RING_INNER_RADIUS,
+    center, center, RING_OUTER_RADIUS,
   )
   radial.addColorStop(0, 'rgba(0, 0, 0, 0.25)')
   radial.addColorStop(0.15, 'rgba(0, 0, 0, 0)')
@@ -39,8 +37,8 @@ const drawTokenRing = (ctx: CanvasRenderingContext2D): void => {
 
   ctx.save()
   ctx.beginPath()
-  ctx.arc(CENTER, CENTER, RING_OUTER_RADIUS, 0, Math.PI * 2)
-  ctx.arc(CENTER, CENTER, RING_INNER_RADIUS, 0, Math.PI * 2, true)
+  ctx.arc(center, center, RING_OUTER_RADIUS, 0, Math.PI * 2)
+  ctx.arc(center, center, RING_INNER_RADIUS, 0, Math.PI * 2, true)
 
   // Base metallic fill
   ctx.fillStyle = conic
@@ -61,16 +59,18 @@ const drawClippedImage = (
   image: HTMLImageElement,
   transform: Transform,
   arc: Arc,
+  canvasSize: number,
 ): void => {
-  const mask = createMaskPath(arc.centerAngle, arc.halfWidth)
+  const mask = createMaskPath(arc.centerAngle, arc.halfWidth, canvasSize)
+  const center = canvasSize / 2
 
   ctx.save()
   ctx.clip(mask)
 
   const drawWidth = image.width * transform.zoom
   const drawHeight = image.height * transform.zoom
-  const drawX = CENTER + transform.panX - drawWidth / 2
-  const drawY = CENTER + transform.panY - drawHeight / 2
+  const drawX = center + transform.panX - drawWidth / 2
+  const drawY = center + transform.panY - drawHeight / 2
 
   ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight)
   ctx.restore()
@@ -84,13 +84,17 @@ export const renderPreview = (
   image: HTMLImageElement,
   transform: Transform,
   arc: Arc,
+  hasExtraPopoutRoom: boolean,
 ): void => {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
-  ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
-  drawTokenRing(ctx)
-  drawClippedImage(ctx, image, transform, arc)
+  const canvasSize = getCanvasSize(hasExtraPopoutRoom)
+  const center = canvasSize / 2
+
+  ctx.clearRect(0, 0, canvasSize, canvasSize)
+  drawTokenRing(ctx, center)
+  drawClippedImage(ctx, image, transform, arc, canvasSize)
 }
 
 /**
@@ -101,15 +105,17 @@ export const renderExport = (
   image: HTMLImageElement,
   transform: Transform,
   arc: Arc,
+  hasExtraPopoutRoom: boolean,
 ): HTMLCanvasElement => {
+  const canvasSize = getCanvasSize(hasExtraPopoutRoom)
   const canvas = document.createElement('canvas')
-  canvas.width = CANVAS_SIZE
-  canvas.height = CANVAS_SIZE
+  canvas.width = canvasSize
+  canvas.height = canvasSize
 
   const ctx = canvas.getContext('2d')
   if (!ctx) return canvas
 
   ctx.translate(VTT_OFFSET_X, VTT_OFFSET_Y)
-  drawClippedImage(ctx, image, transform, arc)
+  drawClippedImage(ctx, image, transform, arc, canvasSize)
   return canvas
 }

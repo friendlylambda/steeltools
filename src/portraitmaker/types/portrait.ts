@@ -1,4 +1,15 @@
-export const CANVAS_SIZE = 1024
+export const BASE_CANVAS_SIZE = 1024
+
+// When extra popout room mode is enabled, the canvas is enlarged by this factor so the character
+// can extend farther beyond the ring before hitting the canvas edge. The ring stays at the same
+// absolute source pixel size, so the extra space becomes headroom for tall hats, weapons, wings,
+// etc. Export resolution rises by the same factor, keeping the character's effective pixel density
+// constant.
+export const POPOUT_CANVAS_MULTIPLIER = 1.5
+export const POPOUT_CANVAS_SIZE = BASE_CANVAS_SIZE * POPOUT_CANVAS_MULTIPLIER
+
+export const getCanvasSize = (hasExtraPopoutRoom: boolean): number =>
+  hasExtraPopoutRoom ? POPOUT_CANVAS_SIZE : BASE_CANVAS_SIZE
 
 // The Draw Steel VTT scales popout portrait overlays up by ~1/0.79x, making
 // them too large relative to the token ring. We enlarge the ring by the same
@@ -42,7 +53,7 @@ export type PortraitState = {
 }
 
 export type PortraitAction =
-  | { readonly type: 'SET_IMAGE'; readonly image: HTMLImageElement; readonly objectUrl: string }
-  | { readonly type: 'SET_TRANSFORM'; readonly transform: Transform }
-  | { readonly type: 'SET_ARC'; readonly arc: Arc }
-  | { readonly type: 'RESET' }
+  | { readonly type: "SET_IMAGE"; readonly image: HTMLImageElement; readonly objectUrl: string }
+  | { readonly type: "SET_TRANSFORM"; readonly transform: Transform }
+  | { readonly type: "SET_ARC"; readonly arc: Arc }
+  | { readonly type: "RESET" }

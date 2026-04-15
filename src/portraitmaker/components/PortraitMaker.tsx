@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useCallback, useState } from "react"
 import { Link } from "@tanstack/react-router"
+import { Switch } from "@base-ui/react/switch"
 import { colors, spacing, radius, typography } from "../../theme"
 import { usePortraitState } from "../hooks/usePortraitState"
 import { isModelCached, removeBackground } from "../utils/backgroundRemoval"
@@ -9,6 +10,64 @@ import { PortraitCanvas } from "./PortraitCanvas"
 import { ExportButton } from "./ExportButton"
 import { BackgroundRemovalToggle } from "./BackgroundRemovalToggle"
 import { BackgroundRemovalModal } from "./BackgroundRemovalModal"
+
+type ExtraPopoutRoomToggleProps = {
+  readonly checked: boolean
+  readonly onCheckedChange: (checked: boolean) => void
+}
+
+const ExtraPopoutRoomToggle = ({
+  checked,
+  onCheckedChange,
+}: ExtraPopoutRoomToggleProps): React.ReactElement => (
+  <label
+    css={{
+      display: "flex",
+      alignItems: "center",
+      gap: spacing.medium,
+      cursor: "pointer",
+    }}
+  >
+    <Switch.Root
+      checked={checked}
+      onCheckedChange={onCheckedChange}
+      css={{
+        width: 42,
+        height: 24,
+        padding: 0,
+        borderRadius: 12,
+        border: "none",
+        backgroundColor: colors.secondary30,
+        cursor: "pointer",
+        position: "relative",
+        flexShrink: 0,
+        "&[data-checked]": {
+          backgroundColor: colors.primary,
+        },
+      }}
+    >
+      <Switch.Thumb
+        css={{
+          display: "block",
+          width: 18,
+          height: 18,
+          backgroundColor: colors.text,
+          borderRadius: "50%",
+          position: "absolute",
+          top: 3,
+          left: 3,
+          transition: "transform 150ms ease",
+          "[data-checked] &": {
+            transform: "translateX(18px)",
+          },
+        }}
+      />
+    </Switch.Root>
+    <span css={{ color: colors.text, fontSize: typography.fontSize.medium, lineHeight: 1.4 }}>
+      Extra Pop-Out Room
+    </span>
+  </label>
+)
 
 const backButtonStyles = {
   display: "inline-block",
@@ -28,6 +87,7 @@ const backButtonStyles = {
 export const PortraitMaker = (): React.ReactElement => {
   const [state, actions] = usePortraitState()
   const [bgRemovalEnabled, setBgRemovalEnabled] = useState(false)
+  const [hasExtraPopoutRoom, setHasExtraPopoutRoom] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [processing, setProcessing] = useState(false)
 
@@ -145,14 +205,17 @@ export const PortraitMaker = (): React.ReactElement => {
             image={state.imageState.image}
             transform={state.transform}
             arc={state.arc}
+            hasExtraPopoutRoom={hasExtraPopoutRoom}
             onTransformChange={actions.setTransform}
             onArcChange={actions.setArc}
           />
+          <ExtraPopoutRoomToggle checked={hasExtraPopoutRoom} onCheckedChange={setHasExtraPopoutRoom} />
           <div css={{ display: "flex", gap: spacing.medium, alignItems: "center" }}>
             <ExportButton
               image={state.imageState.image}
               transform={state.transform}
               arc={state.arc}
+              hasExtraPopoutRoom={hasExtraPopoutRoom}
             />
             <button
               type="button"

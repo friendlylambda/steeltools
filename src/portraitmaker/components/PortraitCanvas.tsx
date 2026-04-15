@@ -1,15 +1,14 @@
 /** @jsxImportSource @emotion/react */
 import { useRef, useEffect } from "react"
 import {
-  CANVAS_SIZE,
   RING_OUTER_RADIUS,
+  getCanvasSize,
   type Transform,
   type Arc,
 } from "../types/portrait"
 import { renderPreview } from "../utils/canvasRenderer"
 import { useCanvasInteraction } from "../hooks/useCanvasInteraction"
 
-const CENTER = CANVAS_SIZE / 2
 const BAR_LENGTH = 56
 const BAR_WIDTH = 16
 const BAR_HIT_WIDTH = 48
@@ -18,6 +17,7 @@ type PortraitCanvasProps = {
   readonly image: HTMLImageElement
   readonly transform: Transform
   readonly arc: Arc
+  readonly hasExtraPopoutRoom: boolean
   readonly onTransformChange: (transform: Transform) => void
   readonly onArcChange: (arc: Arc) => void
 }
@@ -25,25 +25,29 @@ type PortraitCanvasProps = {
 /**
  * Compute the two endpoints of a radial bar extending outward from the ring's outer edge.
  */
-const handleBar = (angle: number): {
+const handleBar = (angle: number, center: number): {
   readonly x1: number; readonly y1: number
   readonly x2: number; readonly y2: number
 } => ({
-  x1: CENTER + RING_OUTER_RADIUS * Math.cos(angle),
-  y1: CENTER + RING_OUTER_RADIUS * Math.sin(angle),
-  x2: CENTER + (RING_OUTER_RADIUS + BAR_LENGTH) * Math.cos(angle),
-  y2: CENTER + (RING_OUTER_RADIUS + BAR_LENGTH) * Math.sin(angle),
+  x1: center + RING_OUTER_RADIUS * Math.cos(angle),
+  y1: center + RING_OUTER_RADIUS * Math.sin(angle),
+  x2: center + (RING_OUTER_RADIUS + BAR_LENGTH) * Math.cos(angle),
+  y2: center + (RING_OUTER_RADIUS + BAR_LENGTH) * Math.sin(angle),
 })
 
 export const PortraitCanvas = ({
   image,
   transform,
   arc,
+  hasExtraPopoutRoom,
   onTransformChange,
   onArcChange,
 }: PortraitCanvasProps): React.ReactElement => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const canvasSize = getCanvasSize(hasExtraPopoutRoom)
+  const center = canvasSize / 2
 
   const {
     onCanvasPointerDown,
@@ -59,9 +63,9 @@ export const PortraitCanvas = ({
   useEffect(() => {
     const canvas = canvasRef.current
     if (canvas) {
-      renderPreview(canvas, image, transform, arc)
+      renderPreview(canvas, image, transform, arc, hasExtraPopoutRoom)
     }
-  }, [image, transform, arc])
+  }, [image, transform, arc, hasExtraPopoutRoom])
 
   // Attach non-passive wheel listener
   useEffect(() => {
@@ -72,8 +76,8 @@ export const PortraitCanvas = ({
     return () => canvas.removeEventListener("wheel", onCanvasWheel)
   }, [onCanvasWheel])
 
-  const startBar = handleBar(arc.centerAngle - arc.halfWidth)
-  const endBar = handleBar(arc.centerAngle + arc.halfWidth)
+  const startBar = handleBar(arc.centerAngle - arc.halfWidth, center)
+  const endBar = handleBar(arc.centerAngle + arc.halfWidth, center)
 
   return (
     <div
@@ -88,8 +92,8 @@ export const PortraitCanvas = ({
     >
       <canvas
         ref={canvasRef}
-        width={CANVAS_SIZE}
-        height={CANVAS_SIZE}
+        width={canvasSize}
+        height={canvasSize}
         css={{
           width: "100%",
           height: "100%",
@@ -101,7 +105,7 @@ export const PortraitCanvas = ({
         onPointerUp={onCanvasPointerUp}
       />
       <svg
-        viewBox={`0 0 ${CANVAS_SIZE} ${CANVAS_SIZE}`}
+        viewBox={`0 0 ${canvasSize} ${canvasSize}`}
         css={{
           position: "absolute",
           top: 0,
@@ -113,7 +117,7 @@ export const PortraitCanvas = ({
       >
         {/* Arc indicator connecting bar midpoints along the clipped side */}
         <path
-          d={describeClippedArcPath(arc.centerAngle, arc.halfWidth)}
+          d={describeClippedArcPath(arc.centerAngle, arc.halfWidth, center)}
           fill="none"
           stroke="#c9b082"
           strokeWidth={6}
@@ -169,16 +173,16 @@ export const PortraitCanvas = ({
  * Build an SVG arc path along the ring midline on the clipped (non-popout) side,
  * going clockwise from the end handle back around to the start handle.
  */
-const describeClippedArcPath = (centerAngle: number, halfWidth: number): string => {
+const describeClippedArcPath = (centerAngle: number, halfWidth: number, center: number): string => {
   const barMid = RING_OUTER_RADIUS + BAR_LENGTH / 2
   const startAngle = centerAngle - halfWidth
   const endAngle = centerAngle + halfWidth
 
   // Arc goes from end → start (the long way around = clipped side)
-  const x1 = CENTER + barMid * Math.cos(endAngle)
-  const y1 = CENTER + barMid * Math.sin(endAngle)
-  const x2 = CENTER + barMid * Math.cos(startAngle)
-  const y2 = CENTER + barMid * Math.sin(startAngle)
+  const x1 = center + barMid * Math.cos(endAngle)
+  const y1 = center + barMid * Math.sin(endAngle)
+  const x2 = center + barMid * Math.cos(startAngle)
+  const y2 = center + barMid * Math.sin(startAngle)
 
   // The clipped side spans 2π - 2*halfWidth; it's > π when halfWidth < π/2
   const largeArc = halfWidth < Math.PI / 2 ? 1 : 0

@@ -102,7 +102,7 @@ export const useMontageStore = create<MontageStore>()(
     }),
     {
       name: "montagemaker-store",
-      version: 4,
+      version: 5,
       migrate: (persistedState, version) => {
         let state = persistedState as { montages: Record<string, unknown> }
 
@@ -179,6 +179,27 @@ export const useMontageStore = create<MontageStore>()(
                 heroCount: null,
               },
             ]),
+          )
+          state = { ...state, montages: migratedMontages }
+        }
+
+        if (version < 5) {
+          const migratedMontages = Object.fromEntries(
+            Object.entries(state.montages).map(([id, montage]) => {
+              const typedMontage = montage as {
+                challenges?: Array<{ consequences?: string | null }>
+              }
+              return [
+                id,
+                {
+                  ...typedMontage,
+                  challenges: (typedMontage.challenges ?? []).map((challenge) => ({
+                    ...challenge,
+                    consequences: challenge.consequences ?? null,
+                  })),
+                },
+              ]
+            }),
           )
           state = { ...state, montages: migratedMontages }
         }

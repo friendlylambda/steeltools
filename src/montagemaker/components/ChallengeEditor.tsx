@@ -162,6 +162,7 @@ export const ChallengeEditor = ({
   const [localName, setLocalName] = useState(value.name)
   const [localDescription, setLocalDescription] = useState(value.description)
   const [localExtraDetails, setLocalExtraDetails] = useState(value.extraDetails ?? "")
+  const [localConsequences, setLocalConsequences] = useState(value.consequences ?? "")
   const [skillInputValue, setSkillInputValue] = useState("")
   const [skillsOpen, setSkillsOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -179,6 +180,10 @@ export const ChallengeEditor = ({
   useEffect(() => {
     setLocalExtraDetails(value.extraDetails ?? "")
   }, [value.extraDetails])
+
+  useEffect(() => {
+    setLocalConsequences(value.consequences ?? "")
+  }, [value.consequences])
 
   // Debounce updates to parent
   useDebounce(
@@ -209,6 +214,16 @@ export const ChallengeEditor = ({
     },
     300,
     [localExtraDetails],
+  )
+
+  useDebounce(
+    () => {
+      if (typeof value.consequences === "string" && localConsequences !== value.consequences) {
+        onChange({ ...value, consequences: localConsequences })
+      }
+    },
+    300,
+    [localConsequences],
   )
 
   const filteredSkills = SKILLS.filter((skill) =>
@@ -437,6 +452,19 @@ export const ChallengeEditor = ({
         </div>
       )}
 
+      {/* Consequences (only shown once enabled, always GM-only in output) */}
+      {typeof value.consequences === "string" && (
+        <div css={{ marginBottom: spacing.medium }}>
+          <label css={labelStyle}>Consequences (hidden from players)</label>
+          <Input
+            value={localConsequences}
+            onChange={(e) => setLocalConsequences(e.target.value)}
+            placeholder="e.g. lose 1 recovery."
+            css={inputStyle}
+          />
+        </div>
+      )}
+
       {/* Characteristics & Skills row */}
       <div css={{ display: "flex", gap: spacing.medium, marginBottom: spacing.medium }}>
         <div css={{ flex: 1 }}>
@@ -643,7 +671,8 @@ export const ChallengeEditor = ({
         css={{
           display: "flex",
           gap: spacing.large,
-          marginBottom: value.extraDetails == null ? spacing.medium : 0,
+          marginBottom:
+            value.extraDetails == null || value.consequences == null ? spacing.medium : 0,
         }}
       >
         <div>
@@ -671,30 +700,43 @@ export const ChallengeEditor = ({
         </div>
       </div>
 
-      {/* Button to add extra details field */}
-      {value.extraDetails == null && (
-        <div css={{ display: "flex", justifyContent: "flex-end" }}>
-          <button
-            type="button"
-            onClick={() => onChange({ ...value, extraDetails: "" })}
-            css={{
-              padding: `${spacing.xsmall} ${spacing.small}`,
-              fontSize: typography.fontSize.small,
-              border: `1px solid ${colors.secondary30}`,
-              borderRadius: radius.small,
-              backgroundColor: "transparent",
-              color: colors.textDim,
-              cursor: "pointer",
-              "&:hover": {
-                borderColor: colors.primary,
-                color: colors.text,
-              },
-            }}
-          >
-            +Details
-          </button>
+      {/* Buttons to add optional fields */}
+      {(value.extraDetails == null || value.consequences == null) && (
+        <div css={{ display: "flex", justifyContent: "flex-end", gap: spacing.small }}>
+          {value.extraDetails == null && (
+            <button
+              type="button"
+              onClick={() => onChange({ ...value, extraDetails: "" })}
+              css={addFieldButtonStyle}
+            >
+              +Details
+            </button>
+          )}
+          {value.consequences == null && (
+            <button
+              type="button"
+              onClick={() => onChange({ ...value, consequences: "" })}
+              css={addFieldButtonStyle}
+            >
+              +Consequences
+            </button>
+          )}
         </div>
       )}
     </div>
   )
 }
+
+const addFieldButtonStyle = {
+  padding: `${spacing.xsmall} ${spacing.small}`,
+  fontSize: typography.fontSize.small,
+  border: `1px solid ${colors.secondary30}`,
+  borderRadius: radius.small,
+  backgroundColor: "transparent",
+  color: colors.textDim,
+  cursor: "pointer",
+  "&:hover": {
+    borderColor: colors.primary,
+    color: colors.text,
+  },
+} as const

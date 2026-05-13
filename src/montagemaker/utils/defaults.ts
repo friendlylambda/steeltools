@@ -9,6 +9,7 @@ export const createDefaultChallenge = (): Challenge => ({
   suggestedSkills: [],
   difficulty: "medium",
   extraDetails: null,
+  consequences: null,
   timesCompletable: 1,
   hidden: false,
 })

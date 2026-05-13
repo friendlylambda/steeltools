@@ -3,7 +3,7 @@ import type { Montage, HeroCount, Difficulty, Challenge } from "../types/montage
 import { DEFAULT_OUTCOMES_HTML } from "../constants/outcomes"
 import { htmlToWrappedMarkdown } from "../../utils/codexMarkdown"
 
-const VISIBLE_WRAPPER_OPEN = "{!"
+const GM_ONLY_WRAPPER_OPEN = "{"
 
 const detailsToMarkdown = (html: string): string => htmlToWrappedMarkdown(html)
 
@@ -136,6 +136,7 @@ const generateChallenge = (challenge: Challenge, includeRollButtons: boolean): s
   const chars = challenge.suggestedCharacteristics.join(" or ")
   const skills = challenge.suggestedSkills.join(" or ")
   const extraDetails = challenge.extraDetails?.trim()
+  const consequences = challenge.consequences?.trim()
   const checkboxCount = challenge.timesCompletable ?? 1
   const checkboxes = Array(checkboxCount)
     .fill("[ ]")
@@ -157,8 +158,17 @@ const generateChallenge = (challenge: Challenge, includeRollButtons: boolean): s
 
   const base = baseLines.join("\n")
 
+  const consequencesBlock = consequences
+    ? dedent`
+        {
+        **Consequences:** ${consequences}
+        }`
+    : ""
+
+  const withConsequences = consequencesBlock ? `${base}\n${consequencesBlock}` : base
+
   if (!includeRollButtons) {
-    return base
+    return withConsequences
   }
 
   // Build roll button label: "{name}: {chars} ({skills})"
@@ -172,7 +182,7 @@ const generateChallenge = (challenge: Challenge, includeRollButtons: boolean): s
   const difficultyKeyword = difficultyLabels[challenge.difficulty]
 
   return dedent`
-    ${base}
+    ${withConsequences}
     {
     |${rollLabel}${skillsSuffix}
     |${difficultyKeyword}
@@ -188,7 +198,7 @@ const generateChallenges = (montage: Montage): string => {
     .map((challenge) => {
       const challengeMarkdown = generateChallenge(challenge, includeRollButtons)
       if (challenge.hidden) {
-        return `${VISIBLE_WRAPPER_OPEN}\n${challengeMarkdown}\n}`
+        return `${GM_ONLY_WRAPPER_OPEN}\n${challengeMarkdown}\n}`
       }
       return challengeMarkdown
     })

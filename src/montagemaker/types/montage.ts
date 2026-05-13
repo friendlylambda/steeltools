@@ -20,6 +20,7 @@ export interface Challenge {
   readonly suggestedSkills: readonly string[]
   readonly difficulty: Difficulty
   readonly extraDetails: string | null
+  readonly consequences: string | null
   readonly timesCompletable: number
   readonly hidden: boolean
 }

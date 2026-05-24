@@ -184,8 +184,9 @@ export const PortraitMaker = (): React.ReactElement => {
           maxWidth: 600,
         }}
       >
-        Scroll up/down to resize, drag the image to reposition, and drag the handles to determine
-        where to crop and where to pop your image out over the token ring.
+        Scroll up/down to resize, drag the image to reposition, drag the side handles to determine
+        where to crop and where to pop your image out over the token ring, and drag the top box to
+        rotate (hold Shift to snap).
       </p>
       <p
         css={{

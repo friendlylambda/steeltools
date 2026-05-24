@@ -2,6 +2,7 @@ import {
   RING_INNER_RADIUS,
   ARC_HALF_WIDTH_MIN,
   ARC_HALF_WIDTH_MAX,
+  ROTATION_SNAP,
 } from '../types/portrait'
 
 /**
@@ -60,3 +61,9 @@ export const pointerToAngle = (clientX: number, clientY: number, rect: DOMRect):
  */
 export const clampHalfWidth = (halfWidth: number): number =>
   Math.max(ARC_HALF_WIDTH_MIN, Math.min(ARC_HALF_WIDTH_MAX, halfWidth))
+
+/**
+ * Snap an angle (radians) to the nearest 15° increment.
+ */
+export const snapRotation = (angle: number): number =>
+  Math.round(angle / ROTATION_SNAP) * ROTATION_SNAP

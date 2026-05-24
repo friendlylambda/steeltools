@@ -30,6 +30,9 @@ export const ARC_HALF_WIDTH_MAX = (11 * Math.PI) / 12 // 165° → 330° total m
 export const DEFAULT_ARC_CENTER = -Math.PI / 2 // north
 export const DEFAULT_ARC_HALF_WIDTH = Math.PI / 2 // 180° total
 
+export const DEFAULT_ROTATION = 0
+export const ROTATION_SNAP = Math.PI / 12 // 15°
+
 export type ImageState = {
   readonly image: HTMLImageElement
   readonly objectUrl: string
@@ -39,6 +42,7 @@ export type Transform = {
   readonly panX: number
   readonly panY: number
   readonly zoom: number
+  readonly rotation: number
 }
 
 export type Arc = {

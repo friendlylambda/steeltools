@@ -69,10 +69,14 @@ const drawClippedImage = (
 
   const drawWidth = image.width * transform.zoom
   const drawHeight = image.height * transform.zoom
-  const drawX = center + transform.panX - drawWidth / 2
-  const drawY = center + transform.panY - drawHeight / 2
 
-  ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight)
+  // Rotate around the canvas center; pan is stored in the image's local
+  // (pre-rotation) frame so the image swings with rotation, as if the whole
+  // canvas were spinning.
+  ctx.translate(center, center)
+  ctx.rotate(transform.rotation)
+  ctx.translate(transform.panX, transform.panY)
+  ctx.drawImage(image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight)
   ctx.restore()
 }
 

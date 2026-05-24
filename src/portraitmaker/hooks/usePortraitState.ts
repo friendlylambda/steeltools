@@ -3,6 +3,7 @@ import {
   RING_INNER_RADIUS,
   DEFAULT_ARC_CENTER,
   DEFAULT_ARC_HALF_WIDTH,
+  DEFAULT_ROTATION,
   type PortraitState,
   type PortraitAction,
   type Transform,
@@ -11,7 +12,7 @@ import {
 
 const initialState: PortraitState = {
   imageState: null,
-  transform: { panX: 0, panY: 0, zoom: 1 },
+  transform: { panX: 0, panY: 0, zoom: 1, rotation: DEFAULT_ROTATION },
   arc: { centerAngle: DEFAULT_ARC_CENTER, halfWidth: DEFAULT_ARC_HALF_WIDTH },
 }
 
@@ -25,6 +26,7 @@ const reducer = (state: PortraitState, action: PortraitAction): PortraitState =>
           panX: 0,
           panY: 0,
           zoom: (RING_INNER_RADIUS * 2) / Math.min(action.image.width, action.image.height),
+          rotation: DEFAULT_ROTATION,
         },
       }
     case "SET_TRANSFORM":

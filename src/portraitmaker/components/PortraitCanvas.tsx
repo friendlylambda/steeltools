@@ -13,6 +13,22 @@ const BAR_LENGTH = 56
 const BAR_WIDTH = 16
 const BAR_HIT_WIDTH = 48
 
+const ROTATE_STICK_LENGTH = 84
+const ROTATE_STICK_WIDTH = 6
+const ROTATE_BOX_SIZE = 22
+const ROTATE_HIT_WIDTH = 36
+
+// 24×24 curved-arrow rotation cursor — Lucide RotateCcw geometry, where the
+// arc flows smoothly into the arrowhead (no L-shaped polyline join).
+// Black halo + white fill for contrast on any background. Hotspot 12,12.
+const ROTATE_CURSOR =
+  "url(\"data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg stroke='black' stroke-width='4'%3E%3Cpath d='M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8'/%3E%3Cpath d='M3 3v5h5'/%3E%3C/g%3E%3Cg stroke='white' stroke-width='2'%3E%3Cpath d='M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8'/%3E%3Cpath d='M3 3v5h5'/%3E%3C/g%3E%3C/svg%3E\") 12 12, grab"
+
+// 24×24 double-headed arched arrow — bidirectional drag-along-arc indicator,
+// same Lucide-flowing-arrowhead style as ROTATE_CURSOR. Hotspot 12,12.
+const ANGLE_HANDLE_CURSOR =
+  "url(\"data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg stroke='black' stroke-width='4'%3E%3Cpath d='M3 14a9.75 9.75 0 0 1 6.74-2.74 9 9 0 0 1 4.52 0 9.75 9.75 0 0 1 6.74 2.74'/%3E%3Cpath d='M3 9v5h5'/%3E%3Cpath d='M21 9v5h-5'/%3E%3C/g%3E%3Cg stroke='white' stroke-width='2'%3E%3Cpath d='M3 14a9.75 9.75 0 0 1 6.74-2.74 9 9 0 0 1 4.52 0 9.75 9.75 0 0 1 6.74 2.74'/%3E%3Cpath d='M3 9v5h5'/%3E%3Cpath d='M21 9v5h-5'/%3E%3C/g%3E%3C/svg%3E\") 12 12, grab"
+
 type PortraitCanvasProps = {
   readonly image: HTMLImageElement
   readonly transform: Transform
@@ -57,6 +73,9 @@ export const PortraitCanvas = ({
     onHandlePointerDown,
     onHandlePointerMove,
     onHandlePointerUp,
+    onRotateHandlePointerDown,
+    onRotateHandlePointerMove,
+    onRotateHandlePointerUp,
   } = useCanvasInteraction(transform, arc, onTransformChange, onArcChange, containerRef)
 
   // Render preview whenever state changes
@@ -78,6 +97,16 @@ export const PortraitCanvas = ({
 
   const startBar = handleBar(arc.centerAngle - arc.halfWidth, center)
   const endBar = handleBar(arc.centerAngle + arc.halfWidth, center)
+
+  // Rotation handle orbits the ring's outer perimeter; rotation pivots
+  // around canvas center so cursor stays locked to the handle.
+  const rotateAngle = -Math.PI / 2 + transform.rotation
+  const rotateDx = Math.cos(rotateAngle)
+  const rotateDy = Math.sin(rotateAngle)
+  const rotateAnchorX = center + RING_OUTER_RADIUS * rotateDx
+  const rotateAnchorY = center + RING_OUTER_RADIUS * rotateDy
+  const rotateTipX = center + (RING_OUTER_RADIUS + ROTATE_STICK_LENGTH) * rotateDx
+  const rotateTipY = center + (RING_OUTER_RADIUS + ROTATE_STICK_LENGTH) * rotateDy
 
   return (
     <div
@@ -129,7 +158,7 @@ export const PortraitCanvas = ({
           stroke="transparent"
           strokeWidth={BAR_HIT_WIDTH}
           strokeLinecap="round"
-          css={{ pointerEvents: "all", cursor: "grab", "&:active": { cursor: "grabbing" } }}
+          css={{ pointerEvents: "all", cursor: ANGLE_HANDLE_CURSOR }}
           onPointerDown={(event) => onHandlePointerDown("start", event)}
           onPointerMove={onHandlePointerMove}
           onPointerUp={onHandlePointerUp}
@@ -150,7 +179,7 @@ export const PortraitCanvas = ({
           stroke="transparent"
           strokeWidth={BAR_HIT_WIDTH}
           strokeLinecap="round"
-          css={{ pointerEvents: "all", cursor: "grab", "&:active": { cursor: "grabbing" } }}
+          css={{ pointerEvents: "all", cursor: ANGLE_HANDLE_CURSOR }}
           onPointerDown={(event) => onHandlePointerDown("end", event)}
           onPointerMove={onHandlePointerMove}
           onPointerUp={onHandlePointerUp}
@@ -163,6 +192,42 @@ export const PortraitCanvas = ({
           strokeWidth={BAR_WIDTH}
           strokeLinecap="butt"
           css={{ pointerEvents: "none" }}
+        />
+        {/* Rotation handle — invisible hit area (stick + box) */}
+        <line
+          x1={rotateAnchorX} y1={rotateAnchorY}
+          x2={rotateTipX} y2={rotateTipY}
+          stroke="transparent"
+          strokeWidth={ROTATE_HIT_WIDTH}
+          strokeLinecap="round"
+          css={{ pointerEvents: "all", cursor: ROTATE_CURSOR }}
+          onPointerDown={onRotateHandlePointerDown}
+          onPointerMove={onRotateHandlePointerMove}
+          onPointerUp={onRotateHandlePointerUp}
+        />
+        {/* Rotation handle — visible stick */}
+        <line
+          x1={rotateAnchorX} y1={rotateAnchorY}
+          x2={rotateTipX} y2={rotateTipY}
+          stroke="#c9b082"
+          strokeWidth={ROTATE_STICK_WIDTH}
+          strokeLinecap="butt"
+          css={{ pointerEvents: "none" }}
+        />
+        {/* Rotation handle — visible box at tip, oriented along the stick */}
+        <rect
+          x={-ROTATE_BOX_SIZE / 2}
+          y={-ROTATE_BOX_SIZE / 2}
+          width={ROTATE_BOX_SIZE}
+          height={ROTATE_BOX_SIZE}
+          fill="#c9b082"
+          stroke="#3a2f1f"
+          strokeWidth={2}
+          transform={`translate(${rotateTipX} ${rotateTipY}) rotate(${(rotateAngle * 180) / Math.PI})`}
+          css={{ pointerEvents: "all", cursor: ROTATE_CURSOR }}
+          onPointerDown={onRotateHandlePointerDown}
+          onPointerMove={onRotateHandlePointerMove}
+          onPointerUp={onRotateHandlePointerUp}
         />
       </svg>
     </div>

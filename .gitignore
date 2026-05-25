@@ -4,3 +4,6 @@ dist/
 *.tsbuildinfo
 .claude/settings.local.json
 /Draw Steel System Reference
+
+# Local Netlify folder
+.netlify

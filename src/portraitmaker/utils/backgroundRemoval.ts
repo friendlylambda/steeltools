@@ -1,5 +1,5 @@
-const MODEL_ID = "Xenova/modnet"
-const CACHE_NAME = "transformers-cache"
+export const MODEL_ID = "Xenova/modnet"
+export const CACHE_NAME = "transformers-cache"
 
 type RawImageLike = {
   readonly toBlob: (type?: string, quality?: number) => Promise<Blob>

@@ -8,15 +8,16 @@ import {
   loadModel,
   WebGpuInitError,
 } from "../utils/backgroundRemoval"
+import { type DiagnosticFlag, downloadDiagnosticReport } from "../utils/portraitDiagnostics"
 
 type ModalPhase =
   | { readonly step: "checking" }
   | { readonly step: "unsupported" }
-  | { readonly step: "incompatible" }
+  | { readonly step: "incompatible"; readonly error: unknown }
   | { readonly step: "ready" }
   | { readonly step: "downloading"; readonly progress: number }
   | { readonly step: "complete" }
-  | { readonly step: "error"; readonly message: string }
+  | { readonly step: "error"; readonly message: string; readonly error: unknown }
 
 type BackgroundRemovalModalProps = {
   readonly onComplete: () => void
@@ -64,11 +65,12 @@ export const BackgroundRemovalModal = ({
     } catch (error) {
       console.error("[BackgroundRemoval] loadModel failed", error)
       if (error instanceof WebGpuInitError) {
-        setPhase({ step: "incompatible" })
+        setPhase({ step: "incompatible", error })
       } else {
         setPhase({
           step: "error",
           message: error instanceof Error ? error.message : "An unexpected error occurred.",
+          error,
         })
       }
       // Wipe any partially-cached model so a future attempt re-runs the
@@ -142,9 +144,12 @@ export const BackgroundRemovalModal = ({
                 and click Remove Background
               </li>
             </ul>
-            <button type="button" onClick={onCancel} css={buttonStyle}>
-              OK
-            </button>
+            <div css={{ display: "flex", gap: spacing.medium, justifyContent: "flex-end" }}>
+              <DownloadReportButton flaggedAs="unsupported" />
+              <button type="button" onClick={onCancel} css={buttonStyle}>
+                OK
+              </button>
+            </div>
           </>
         )}
 
@@ -178,14 +183,17 @@ export const BackgroundRemovalModal = ({
                 and click Remove Background
               </li>
             </ul>
-            <button
-              type="button"
-              onClick={onCancel}
-              disabled={cacheCleanupIsPending}
-              css={buttonStyle}
-            >
-              OK
-            </button>
+            <div css={{ display: "flex", gap: spacing.medium, justifyContent: "flex-end" }}>
+              <DownloadReportButton flaggedAs="incompatible" capturedError={phase.error} />
+              <button
+                type="button"
+                onClick={onCancel}
+                disabled={cacheCleanupIsPending}
+                css={buttonStyle}
+              >
+                OK
+              </button>
+            </div>
           </>
         )}
 
@@ -298,7 +306,15 @@ export const BackgroundRemovalModal = ({
             >
               {phase.message}
             </p>
-            <div css={{ display: "flex", gap: spacing.medium, justifyContent: "flex-end" }}>
+            <div
+              css={{
+                display: "flex",
+                gap: spacing.medium,
+                justifyContent: "flex-end",
+                flexWrap: "wrap",
+              }}
+            >
+              <DownloadReportButton flaggedAs="error" capturedError={phase.error} />
               <button type="button" onClick={onCancel} css={secondaryButtonStyle}>
                 Cancel
               </button>
@@ -315,6 +331,51 @@ export const BackgroundRemovalModal = ({
         )}
       </div>
     </div>
+  )
+}
+
+type DownloadReportState = "idle" | "gathering" | "done" | "failed"
+
+const DOWNLOAD_REPORT_LABELS: Record<DownloadReportState, string> = {
+  idle: "Download error report",
+  gathering: "Gathering…",
+  done: "Report downloaded",
+  failed: "Failed — see console",
+}
+
+const DownloadReportButton = ({
+  flaggedAs,
+  capturedError,
+}: {
+  readonly flaggedAs: DiagnosticFlag
+  readonly capturedError?: unknown
+}): React.ReactElement => {
+  const [state, setState] = useState<DownloadReportState>("idle")
+
+  const handleClick = useCallback(async () => {
+    setState("gathering")
+    try {
+      const report = await downloadDiagnosticReport({ flaggedAs, capturedError })
+      // Also log it so the report is still recoverable if the file download is
+      // blocked (e.g. pop-up/download restrictions in a locked-down browser).
+      console.info("[BackgroundRemoval] diagnostic report\n", report)
+      setState("done")
+    } catch (downloadError) {
+      console.error("[BackgroundRemoval] failed to generate diagnostic report", downloadError)
+      setState("failed")
+    }
+    window.setTimeout(() => setState("idle"), 3000)
+  }, [flaggedAs, capturedError])
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={state === "gathering"}
+      css={secondaryButtonStyle}
+    >
+      {DOWNLOAD_REPORT_LABELS[state]}
+    </button>
   )
 }
 

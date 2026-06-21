@@ -14,6 +14,8 @@ import safetyCardsIcon from "./images/safety-cards/icon.png"
 import clocks1 from "./images/clocks/1.png"
 import clocks2 from "./images/clocks/2.png"
 import clocksIcon from "./images/clocks/icon.png"
+import heroTokenRefiller1 from "./images/hero-token-auto-refiller/1.png"
+import heroTokenRefillerIcon from "./images/hero-token-auto-refiller/icon.png"
 
 /**
  * Add your Codex Mods here. Each entry automatically gets its own
@@ -41,6 +43,13 @@ export const codexMods: readonly CodexMod[] = [
       "Adds a panel that lets the Director create Blades in the Dark style clocks to track various counters in the game. Click + to add a clock (defaults to 3 segments). Left click a clock's image to fill a segment, right click to remove one. Click a clock's name to edit its name and number of segments or delete it. Toggle the eye icon to switch between director-only and player-visible.",
     icon: clocksIcon,
     images: [clocks1, clocks2],
+  },
+  {
+    name: "Hero Token Auto Refiller",
+    description:
+      "Automatically refills the party's Hero Tokens at the start of a session. Enable session-start detection, set the number of Hero Tokens to refill to, and the minimum number of players online required to trigger the refill.",
+    icon: heroTokenRefillerIcon,
+    images: [heroTokenRefiller1],
   },
   {
     name: "Safety Cards",

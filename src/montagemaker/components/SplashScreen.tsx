@@ -18,6 +18,7 @@ export const SplashScreen = (): React.ReactElement => {
   const montages = useMontageStore((state) => state.montages)
   const createMontage = useMontageStore((state) => state.createMontage)
   const deleteMontage = useMontageStore((state) => state.deleteMontage)
+  const duplicateMontage = useMontageStore((state) => state.duplicateMontage)
 
   const sortedMontages = Object.values(montages).toSorted(
     (a: Montage, b: Montage) => b.updatedAt - a.updatedAt
@@ -34,6 +35,10 @@ export const SplashScreen = (): React.ReactElement => {
 
   const handleDelete = (id: string): void => {
     deleteMontage(id)
+  }
+
+  const handleDuplicate = (id: string): void => {
+    duplicateMontage(id)
   }
 
   return (
@@ -125,6 +130,23 @@ export const SplashScreen = (): React.ReactElement => {
                   {formatDate(montage.updatedAt)}
                 </div>
               </button>
+              <Button
+                onClick={() => handleDuplicate(montage.id)}
+                css={{
+                  padding: `${spacing.xsmall} ${spacing.small}`,
+                  fontSize: typography.fontSize.small,
+                  border: 'none',
+                  borderRadius: radius.small,
+                  cursor: 'pointer',
+                  backgroundColor: 'transparent',
+                  color: colors.secondary,
+                  '&:hover': {
+                    backgroundColor: colors.backgroundCard,
+                  },
+                }}
+              >
+                Duplicate
+              </Button>
               <AlertDialog.Root>
                 <AlertDialog.Trigger
                   css={{

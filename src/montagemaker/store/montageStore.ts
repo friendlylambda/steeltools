@@ -29,6 +29,7 @@ interface MontageStore {
     >,
   ) => void
   readonly deleteMontage: (id: string) => void
+  readonly duplicateMontage: (id: string) => string | null
   readonly setCurrentId: (id: string | null) => void
 }
 
@@ -84,6 +85,29 @@ export const useMontageStore = create<MontageStore>()(
             },
           }
         })
+      },
+
+      duplicateMontage: (id) => {
+        const existing = get().montages[id]
+        if (!existing) return null
+        const newId = nanoid(8)
+        const now = Date.now()
+        const cloned = structuredClone(existing)
+        const copy: Montage = {
+          ...cloned,
+          id: newId,
+          title: `${cloned.title || "Untitled"} (Copy)`,
+          challenges: cloned.challenges.map((challenge) => ({
+            ...challenge,
+            id: nanoid(8),
+          })),
+          createdAt: now,
+          updatedAt: now,
+        }
+        set((state) => ({
+          montages: { ...state.montages, [newId]: copy },
+        }))
+        return newId
       },
 
       deleteMontage: (id) => {

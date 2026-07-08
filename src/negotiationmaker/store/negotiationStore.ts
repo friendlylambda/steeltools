@@ -28,6 +28,7 @@ interface NegotiationStore {
     >,
   ) => void
   readonly deleteNegotiation: (id: string) => void
+  readonly duplicateNegotiation: (id: string) => string | null
   readonly setCurrentId: (id: string | null) => void
 }
 
@@ -81,6 +82,33 @@ export const useNegotiationStore = create<NegotiationStore>()(
             },
           }
         })
+      },
+
+      duplicateNegotiation: (id) => {
+        const existing = get().negotiations[id]
+        if (!existing) return null
+        const newId = nanoid(8)
+        const now = Date.now()
+        const cloned = structuredClone(existing)
+        const copy: Negotiation = {
+          ...cloned,
+          id: newId,
+          title: `${cloned.title || "Untitled"} (Copy)`,
+          motivations: cloned.motivations.map((motivation) => ({
+            ...motivation,
+            id: nanoid(8),
+          })),
+          pitfalls: cloned.pitfalls.map((pitfall) => ({
+            ...pitfall,
+            id: nanoid(8),
+          })),
+          createdAt: now,
+          updatedAt: now,
+        }
+        set((state) => ({
+          negotiations: { ...state.negotiations, [newId]: copy },
+        }))
+        return newId
       },
 
       deleteNegotiation: (id) => {

@@ -18,6 +18,7 @@ export const SplashScreen = (): React.ReactElement => {
   const negotiations = useNegotiationStore((state) => state.negotiations)
   const createNegotiation = useNegotiationStore((state) => state.createNegotiation)
   const deleteNegotiation = useNegotiationStore((state) => state.deleteNegotiation)
+  const duplicateNegotiation = useNegotiationStore((state) => state.duplicateNegotiation)
 
   const sortedNegotiations = Object.values(negotiations).toSorted(
     (negotiationA: Negotiation, negotiationB: Negotiation) =>
@@ -35,6 +36,10 @@ export const SplashScreen = (): React.ReactElement => {
 
   const handleDelete = (id: string): void => {
     deleteNegotiation(id)
+  }
+
+  const handleDuplicate = (id: string): void => {
+    duplicateNegotiation(id)
   }
 
   return (
@@ -128,6 +133,23 @@ export const SplashScreen = (): React.ReactElement => {
                   {formatDate(negotiation.updatedAt)}
                 </div>
               </button>
+              <Button
+                onClick={() => handleDuplicate(negotiation.id)}
+                css={{
+                  padding: `${spacing.xsmall} ${spacing.small}`,
+                  fontSize: typography.fontSize.small,
+                  border: "none",
+                  borderRadius: radius.small,
+                  cursor: "pointer",
+                  backgroundColor: "transparent",
+                  color: colors.secondary,
+                  "&:hover": {
+                    backgroundColor: colors.backgroundCard,
+                  },
+                }}
+              >
+                Duplicate
+              </Button>
               <AlertDialog.Root>
                 <AlertDialog.Trigger
                   css={{

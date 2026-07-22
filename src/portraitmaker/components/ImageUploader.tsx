@@ -83,7 +83,7 @@ export const ImageUploader = ({ onFileSelected }: ImageUploaderProps): React.Rea
           marginBottom: spacing.medium,
         }}
       >
-        or click to browse
+        click to browse, or paste with Cmd/Ctrl+V
       </div>
       <div
         css={{

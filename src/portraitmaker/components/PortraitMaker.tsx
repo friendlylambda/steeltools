@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Link } from "@tanstack/react-router"
 import { Switch } from "@base-ui/react/switch"
 import { colors, spacing, radius, typography } from "../../theme"
@@ -134,6 +134,26 @@ export const PortraitMaker = (): React.ReactElement => {
     },
     [actions, bgRemovalEnabled],
   )
+
+  // Populate a blank canvas from the clipboard. A "paste" listener needs no
+  // clipboard permission prompt, unlike navigator.clipboard.read().
+  useEffect(() => {
+    const handlePaste = (event: ClipboardEvent): void => {
+      if (!state.imageState && !processing) {
+        const pastedFile = Array.from(event.clipboardData?.items ?? [])
+          .find((item) => item.type.startsWith("image/"))
+          ?.getAsFile()
+        if (pastedFile) {
+          event.preventDefault()
+          handleFileSelected(pastedFile)
+        }
+      }
+    }
+    window.addEventListener("paste", handlePaste)
+    return () => {
+      window.removeEventListener("paste", handlePaste)
+    }
+  }, [state.imageState, processing, handleFileSelected])
 
   return (
     <div

@@ -178,8 +178,7 @@ export const ChallengeSummary = ({
   const orderedCharacteristicSegments = CHARACTERISTICS.map((char) =>
     characteristicSegments.find((s) => s.label === char),
   ).filter(
-    (stackedBarSegment): stackedBarSegment is StackedBarSegment =>
-      stackedBarSegment !== undefined,
+    (stackedBarSegment): stackedBarSegment is StackedBarSegment => stackedBarSegment !== undefined,
   )
 
   return (

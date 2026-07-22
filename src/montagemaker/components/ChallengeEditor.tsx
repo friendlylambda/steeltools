@@ -331,91 +331,91 @@ export const ChallengeEditor = ({
           >
             <TrashIcon />
           </Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Backdrop
-            css={{
-              position: "fixed",
-              inset: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              zIndex: 1000,
-            }}
-          />
-          <Dialog.Popup
-            css={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              backgroundColor: colors.background,
-              border: `1px solid ${colors.secondary30}`,
-              borderRadius: radius.medium,
-              padding: spacing.large,
-              zIndex: 1001,
-              minWidth: "300px",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
-            }}
-          >
-            <Dialog.Title
+          <Dialog.Portal>
+            <Dialog.Backdrop
               css={{
-                margin: 0,
-                marginBottom: spacing.small,
-                fontSize: typography.fontSize.large,
-                color: colors.primary,
+                position: "fixed",
+                inset: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                zIndex: 1000,
+              }}
+            />
+            <Dialog.Popup
+              css={{
+                position: "fixed",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                backgroundColor: colors.background,
+                border: `1px solid ${colors.secondary30}`,
+                borderRadius: radius.medium,
+                padding: spacing.large,
+                zIndex: 1001,
+                minWidth: "300px",
+                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
               }}
             >
-              Delete Challenge
-            </Dialog.Title>
-            <Dialog.Description
-              css={{
-                marginBottom: spacing.large,
-                color: colors.textDim,
-                fontSize: typography.fontSize.small,
-              }}
-            >
-              Are you sure you want to delete this challenge? This action cannot be undone.
-            </Dialog.Description>
-            <div css={{ display: "flex", gap: spacing.small, justifyContent: "flex-end" }}>
-              <Dialog.Close
+              <Dialog.Title
                 css={{
-                  padding: `${spacing.small} ${spacing.medium}`,
-                  fontSize: typography.fontSize.small,
-                  border: `1px solid ${colors.secondary30}`,
-                  borderRadius: radius.small,
-                  backgroundColor: "transparent",
-                  color: colors.text,
-                  cursor: "pointer",
-                  "&:hover": {
-                    backgroundColor: colors.backgroundLight,
-                  },
+                  margin: 0,
+                  marginBottom: spacing.small,
+                  fontSize: typography.fontSize.large,
+                  color: colors.primary,
                 }}
               >
-                Cancel
-              </Dialog.Close>
-              <button
-                type="button"
-                onClick={() => {
-                  setDeleteDialogOpen(false)
-                  onDelete()
-                }}
+                Delete Challenge
+              </Dialog.Title>
+              <Dialog.Description
                 css={{
-                  padding: `${spacing.small} ${spacing.medium}`,
+                  marginBottom: spacing.large,
+                  color: colors.textDim,
                   fontSize: typography.fontSize.small,
-                  border: "none",
-                  borderRadius: radius.small,
-                  backgroundColor: "#c44",
-                  color: colors.text,
-                  cursor: "pointer",
-                  "&:hover": {
-                    backgroundColor: "#a33",
-                  },
                 }}
               >
-                Delete
-              </button>
-            </div>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+                Are you sure you want to delete this challenge? This action cannot be undone.
+              </Dialog.Description>
+              <div css={{ display: "flex", gap: spacing.small, justifyContent: "flex-end" }}>
+                <Dialog.Close
+                  css={{
+                    padding: `${spacing.small} ${spacing.medium}`,
+                    fontSize: typography.fontSize.small,
+                    border: `1px solid ${colors.secondary30}`,
+                    borderRadius: radius.small,
+                    backgroundColor: "transparent",
+                    color: colors.text,
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: colors.backgroundLight,
+                    },
+                  }}
+                >
+                  Cancel
+                </Dialog.Close>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeleteDialogOpen(false)
+                    onDelete()
+                  }}
+                  css={{
+                    padding: `${spacing.small} ${spacing.medium}`,
+                    fontSize: typography.fontSize.small,
+                    border: "none",
+                    borderRadius: radius.small,
+                    backgroundColor: "#c44",
+                    color: colors.text,
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "#a33",
+                    },
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
       </div>
       {/* Name & Description row */}
       <div css={{ display: "flex", gap: spacing.medium, marginBottom: spacing.medium }}>

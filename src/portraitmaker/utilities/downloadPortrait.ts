@@ -1,5 +1,5 @@
-import type { Transform, Arc } from '../types/portrait'
-import { renderExport } from './canvasRenderer'
+import type { Transform, Arc } from "../types/portrait"
+import { renderExport } from "./canvasRenderer"
 
 /**
  * Render the portrait to an offscreen canvas and trigger a PNG download.
@@ -16,12 +16,12 @@ export const downloadPortraitPng = (
     if (!blob) return
 
     const url = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
+    const anchor = document.createElement("a")
     anchor.href = url
-    anchor.download = 'popout-portrait.png'
+    anchor.download = "popout-portrait.png"
     anchor.click()
     URL.revokeObjectURL(url)
-  }, 'image/png')
+  }, "image/png")
 }
 
 /**
@@ -39,10 +39,10 @@ export const downloadPortraitWebp = (
     if (!blob) return
 
     const url = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
+    const anchor = document.createElement("a")
     anchor.href = url
-    anchor.download = 'popout-portrait.webp'
+    anchor.download = "popout-portrait.webp"
     anchor.click()
     URL.revokeObjectURL(url)
-  }, 'image/webp')
+  }, "image/webp")
 }

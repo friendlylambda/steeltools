@@ -60,5 +60,4 @@ export const codexMods: readonly CodexMod[] = [
   },
 ]
 
-export const modSlug = (mod: CodexMod): string =>
-  mod.name.toLowerCase().replace(/\s+/g, "-")
+export const modSlug = (mod: CodexMod): string => mod.name.toLowerCase().replace(/\s+/g, "-")

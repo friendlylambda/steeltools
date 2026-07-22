@@ -91,28 +91,28 @@ export const NpcStatsSection = ({
         <label css={labelStyle}>Starting Attitude</label>
         <div css={{ display: "flex", gap: spacing.xsmall, flexWrap: "wrap" }}>
           {STARTING_ATTITUDE_NAMES.map((attitudeName) => (
-              <button
-                key={attitudeName}
-                type="button"
-                onClick={() => handleAttitudeClick(attitudeName)}
-                css={{
-                  padding: `${spacing.xsmall} ${spacing.small}`,
-                  fontSize: typography.fontSize.small,
-                  border: `1px solid ${colors.secondary30}`,
-                  borderRadius: radius.small,
-                  backgroundColor: "transparent",
-                  color: colors.text,
-                  cursor: "pointer",
-                  "&:hover": {
-                    borderColor: colors.primary,
-                    backgroundColor: colors.backgroundCard,
-                  },
-                }}
-                title={`Interest ${STARTING_ATTITUDES[attitudeName]?.interest}, Patience ${STARTING_ATTITUDES[attitudeName]?.patience}`}
-              >
-                {attitudeName}
-              </button>
-            ))}
+            <button
+              key={attitudeName}
+              type="button"
+              onClick={() => handleAttitudeClick(attitudeName)}
+              css={{
+                padding: `${spacing.xsmall} ${spacing.small}`,
+                fontSize: typography.fontSize.small,
+                border: `1px solid ${colors.secondary30}`,
+                borderRadius: radius.small,
+                backgroundColor: "transparent",
+                color: colors.text,
+                cursor: "pointer",
+                "&:hover": {
+                  borderColor: colors.primary,
+                  backgroundColor: colors.backgroundCard,
+                },
+              }}
+              title={`Interest ${STARTING_ATTITUDES[attitudeName]?.interest}, Patience ${STARTING_ATTITUDES[attitudeName]?.patience}`}
+            >
+              {attitudeName}
+            </button>
+          ))}
         </div>
       </div>
 

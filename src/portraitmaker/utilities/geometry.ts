@@ -3,7 +3,7 @@ import {
   ARC_HALF_WIDTH_MIN,
   ARC_HALF_WIDTH_MAX,
   ROTATION_SNAP,
-} from '../types/portrait'
+} from "../types/portrait"
 
 /**
  * Normalise an angle into the range [-PI, PI).

@@ -15,7 +15,13 @@ export const CodexModPage = (): React.ReactElement => {
         <Link to="/" css={{ color: colors.primary, textDecoration: "none" }}>
           &larr; Back
         </Link>
-        <h1 css={{ fontSize: typography.fontSize.xlarge, color: colors.danger, marginTop: spacing.large }}>
+        <h1
+          css={{
+            fontSize: typography.fontSize.xlarge,
+            color: colors.danger,
+            marginTop: spacing.large,
+          }}
+        >
           Mod not found
         </h1>
       </div>
@@ -160,11 +166,7 @@ const ImageCarousel = ({
             >
               &#8249;
             </button>
-            <button
-              onClick={goToNext}
-              aria-label="Next image"
-              css={arrowButtonStyle("right")}
-            >
+            <button onClick={goToNext} aria-label="Next image" css={arrowButtonStyle("right")}>
               &#8250;
             </button>
           </>

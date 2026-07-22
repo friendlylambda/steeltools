@@ -121,7 +121,12 @@ export const Editor = (): React.ReactElement | null => {
         >
           Basic Details
         </h3>
-        <TitleInput value={montage.title} onChange={handleTitleChange} label="Montage Title" placeholder="Enter montage title..." />
+        <TitleInput
+          value={montage.title}
+          onChange={handleTitleChange}
+          label="Montage Title"
+          placeholder="Enter montage title..."
+        />
         <div>
           <label
             css={{

@@ -76,3 +76,4 @@ Generic UI components live in `src/components/` and are imported by multiple too
 
 - Dev server runs perpetually (user manages it). Use Chrome DevTools MCP for browser-based verification.
 - Run `yarn typecheck` for type checking.
+- Always run prettier on the codebase after a batch of changes is complete.

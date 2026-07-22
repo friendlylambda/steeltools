@@ -6,8 +6,8 @@ import {
   getCanvasSize,
   type Transform,
   type Arc,
-} from '../types/portrait'
-import { createMaskPath } from './geometry'
+} from "../types/portrait"
+import { createMaskPath } from "./geometry"
 
 /**
  * Draw the full token ring as a complete circle. In the preview this is
@@ -17,23 +17,27 @@ import { createMaskPath } from './geometry'
 const drawTokenRing = (ctx: CanvasRenderingContext2D, center: number): void => {
   // Conic gradient for metallic sheen — highlights rotate around the ring
   const conic = ctx.createConicGradient(0, center, center)
-  conic.addColorStop(0, '#b0b0b0')
-  conic.addColorStop(0.15, '#e8e8e8')
-  conic.addColorStop(0.3, '#a0a0a0')
-  conic.addColorStop(0.5, '#d8d8d8')
-  conic.addColorStop(0.65, '#909090')
-  conic.addColorStop(0.8, '#e0e0e0')
-  conic.addColorStop(1, '#b0b0b0')
+  conic.addColorStop(0, "#b0b0b0")
+  conic.addColorStop(0.15, "#e8e8e8")
+  conic.addColorStop(0.3, "#a0a0a0")
+  conic.addColorStop(0.5, "#d8d8d8")
+  conic.addColorStop(0.65, "#909090")
+  conic.addColorStop(0.8, "#e0e0e0")
+  conic.addColorStop(1, "#b0b0b0")
 
   // Radial gradient for inner bevel / depth
   const radial = ctx.createRadialGradient(
-    center, center, RING_INNER_RADIUS,
-    center, center, RING_OUTER_RADIUS,
+    center,
+    center,
+    RING_INNER_RADIUS,
+    center,
+    center,
+    RING_OUTER_RADIUS,
   )
-  radial.addColorStop(0, 'rgba(0, 0, 0, 0.25)')
-  radial.addColorStop(0.15, 'rgba(0, 0, 0, 0)')
-  radial.addColorStop(0.85, 'rgba(0, 0, 0, 0)')
-  radial.addColorStop(1, 'rgba(0, 0, 0, 0.3)')
+  radial.addColorStop(0, "rgba(0, 0, 0, 0.25)")
+  radial.addColorStop(0.15, "rgba(0, 0, 0, 0)")
+  radial.addColorStop(0.85, "rgba(0, 0, 0, 0)")
+  radial.addColorStop(1, "rgba(0, 0, 0, 0.3)")
 
   ctx.save()
   ctx.beginPath()
@@ -90,7 +94,7 @@ export const renderPreview = (
   arc: Arc,
   hasExtraPopoutRoom: boolean,
 ): void => {
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext("2d")
   if (!ctx) return
 
   const canvasSize = getCanvasSize(hasExtraPopoutRoom)
@@ -112,11 +116,11 @@ export const renderExport = (
   hasExtraPopoutRoom: boolean,
 ): HTMLCanvasElement => {
   const canvasSize = getCanvasSize(hasExtraPopoutRoom)
-  const canvas = document.createElement('canvas')
+  const canvas = document.createElement("canvas")
   canvas.width = canvasSize
   canvas.height = canvasSize
 
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext("2d")
   if (!ctx) return canvas
 
   ctx.translate(VTT_OFFSET_X, VTT_OFFSET_Y)

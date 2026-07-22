@@ -71,9 +71,7 @@ export const clearCachedModel = async (): Promise<void> => {
   }
 }
 
-const initPipeline = async (
-  onProgress?: (progress: number) => void,
-): Promise<PipelineInstance> => {
+const initPipeline = async (onProgress?: (progress: number) => void): Promise<PipelineInstance> => {
   const { pipeline } = await import("@huggingface/transformers")
   try {
     const instance = await pipeline("background-removal", MODEL_ID, {

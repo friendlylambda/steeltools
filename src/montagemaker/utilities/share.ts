@@ -7,7 +7,7 @@ import { OUTCOMES_MODES } from "../constants/outcomes"
 
 // Bump when the payload shape changes in a way the schema's fallbacks can't absorb.
 export const SHARE_VERSION = 1
-const SHARE_ENDPOINT = "/.netlify/functions/share"
+const SHARE_ENDPOINT = "/api/montage/share"
 const SHARE_PARAM = "share"
 
 // Share payloads are untrusted. The schemas are deliberately lenient: only

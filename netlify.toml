@@ -3,6 +3,13 @@
 [dev]
 framework = "vite"
 
+# API routes. These must come before the SPA catch-all — Netlify applies the
+# first matching redirect rule.
+[[redirects]]
+from = "/api/montage/share"
+to = "/.netlify/functions/share-montage"
+status = 200
+
 [[redirects]]
 from = "/*"
 to = "/index.html"

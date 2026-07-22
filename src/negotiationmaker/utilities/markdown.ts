@@ -1,6 +1,6 @@
 import type { Negotiation, Trait } from "../types/negotiation"
 import { RULES_REFERENCE_TEXT } from "../constants/negotiation"
-import { htmlToMarkdown, htmlToWrappedMarkdown } from "../../utils/codexMarkdown"
+import { htmlToMarkdown, htmlToWrappedMarkdown } from "../../utilities/codexMarkdown"
 
 const generateTrait = (trait: Trait): string => {
   const description = htmlToMarkdown(trait.description)

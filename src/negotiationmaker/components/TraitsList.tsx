@@ -4,7 +4,7 @@ import { motion } from "motion/react"
 import { Menu } from "@base-ui/react/menu"
 import type { Trait } from "../types/negotiation"
 import { MOTIVATION_PRESETS } from "../constants/negotiation"
-import { createDefaultTrait } from "../utils/defaults"
+import { createDefaultTrait } from "../utilities/defaults"
 import { TraitEditor } from "./TraitEditor"
 import { colors, spacing, radius, typography } from "../../theme"
 

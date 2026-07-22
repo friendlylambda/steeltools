@@ -1,12 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useRef, useEffect } from "react"
-import {
-  RING_OUTER_RADIUS,
-  getCanvasSize,
-  type Transform,
-  type Arc,
-} from "../types/portrait"
-import { renderPreview } from "../utils/canvasRenderer"
+import { RING_OUTER_RADIUS, getCanvasSize, type Transform, type Arc } from "../types/portrait"
+import { renderPreview } from "../utilities/canvasRenderer"
 import { useCanvasInteraction } from "../hooks/useCanvasInteraction"
 
 const BAR_LENGTH = 56
@@ -41,9 +36,14 @@ type PortraitCanvasProps = {
 /**
  * Compute the two endpoints of a radial bar extending outward from the ring's outer edge.
  */
-const handleBar = (angle: number, center: number): {
-  readonly x1: number; readonly y1: number
-  readonly x2: number; readonly y2: number
+const handleBar = (
+  angle: number,
+  center: number,
+): {
+  readonly x1: number
+  readonly y1: number
+  readonly x2: number
+  readonly y2: number
 } => ({
   x1: center + RING_OUTER_RADIUS * Math.cos(angle),
   y1: center + RING_OUTER_RADIUS * Math.sin(angle),
@@ -153,8 +153,10 @@ export const PortraitCanvas = ({
         />
         {/* Start edge — invisible hit area */}
         <line
-          x1={startBar.x1} y1={startBar.y1}
-          x2={startBar.x2} y2={startBar.y2}
+          x1={startBar.x1}
+          y1={startBar.y1}
+          x2={startBar.x2}
+          y2={startBar.y2}
           stroke="transparent"
           strokeWidth={BAR_HIT_WIDTH}
           strokeLinecap="round"
@@ -165,8 +167,10 @@ export const PortraitCanvas = ({
         />
         {/* Start edge — visible bar */}
         <line
-          x1={startBar.x1} y1={startBar.y1}
-          x2={startBar.x2} y2={startBar.y2}
+          x1={startBar.x1}
+          y1={startBar.y1}
+          x2={startBar.x2}
+          y2={startBar.y2}
           stroke="#c9b082"
           strokeWidth={BAR_WIDTH}
           strokeLinecap="butt"
@@ -174,8 +178,10 @@ export const PortraitCanvas = ({
         />
         {/* End edge — invisible hit area */}
         <line
-          x1={endBar.x1} y1={endBar.y1}
-          x2={endBar.x2} y2={endBar.y2}
+          x1={endBar.x1}
+          y1={endBar.y1}
+          x2={endBar.x2}
+          y2={endBar.y2}
           stroke="transparent"
           strokeWidth={BAR_HIT_WIDTH}
           strokeLinecap="round"
@@ -186,8 +192,10 @@ export const PortraitCanvas = ({
         />
         {/* End edge — visible bar */}
         <line
-          x1={endBar.x1} y1={endBar.y1}
-          x2={endBar.x2} y2={endBar.y2}
+          x1={endBar.x1}
+          y1={endBar.y1}
+          x2={endBar.x2}
+          y2={endBar.y2}
           stroke="#c9b082"
           strokeWidth={BAR_WIDTH}
           strokeLinecap="butt"
@@ -195,8 +203,10 @@ export const PortraitCanvas = ({
         />
         {/* Rotation handle — invisible hit area (stick + box) */}
         <line
-          x1={rotateAnchorX} y1={rotateAnchorY}
-          x2={rotateTipX} y2={rotateTipY}
+          x1={rotateAnchorX}
+          y1={rotateAnchorY}
+          x2={rotateTipX}
+          y2={rotateTipY}
           stroke="transparent"
           strokeWidth={ROTATE_HIT_WIDTH}
           strokeLinecap="round"
@@ -207,8 +217,10 @@ export const PortraitCanvas = ({
         />
         {/* Rotation handle — visible stick */}
         <line
-          x1={rotateAnchorX} y1={rotateAnchorY}
-          x2={rotateTipX} y2={rotateTipY}
+          x1={rotateAnchorX}
+          y1={rotateAnchorY}
+          x2={rotateTipX}
+          y2={rotateTipY}
           stroke="#c9b082"
           strokeWidth={ROTATE_STICK_WIDTH}
           strokeLinecap="butt"

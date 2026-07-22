@@ -1,5 +1,5 @@
 import type { Montage } from "../types/montage"
-import { generateMarkdown } from "../utils/markdown"
+import { generateMarkdown } from "../utilities/markdown"
 import { ExportActions as SharedExportActions } from "../../components/ExportActions"
 
 interface MontageExportActionsProps {
@@ -12,9 +12,7 @@ export const ExportActions = ({ montage }: MontageExportActionsProps): React.Rea
     copyLabel="Copy Montage Markdown to Clipboard"
     downloadLabel="Download Montage Markdown as a File"
     defaultFilename={
-      montage.title
-        ? `${montage.title.toLowerCase().replace(/\s+/g, "-")}.md`
-        : "montage.md"
+      montage.title ? `${montage.title.toLowerCase().replace(/\s+/g, "-")}.md` : "montage.md"
     }
   />
 )

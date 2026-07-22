@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { nanoid } from "nanoid"
 import type { Negotiation } from "../types/negotiation"
-import { createDefaultOutcomes } from "../utils/defaults"
+import { createDefaultOutcomes } from "../utilities/defaults"
 
 interface NegotiationStore {
   readonly negotiations: Readonly<Record<string, Negotiation>>

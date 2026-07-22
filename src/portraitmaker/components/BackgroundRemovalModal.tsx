@@ -7,8 +7,8 @@ import {
   isModelCached,
   loadModel,
   WebGpuInitError,
-} from "../utils/backgroundRemoval"
-import { type DiagnosticFlag, downloadDiagnosticReport } from "../utils/portraitDiagnostics"
+} from "../utilities/backgroundRemoval"
+import { type DiagnosticFlag, downloadDiagnosticReport } from "../utilities/portraitDiagnostics"
 
 type ModalPhase =
   | { readonly step: "checking" }

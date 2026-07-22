@@ -1,4 +1,9 @@
+# Without this, netlify dev misdetects the project as TanStack Start (via
+# @tanstack/react-router) and waits on port 3000 instead of Vite's 5173.
+[dev]
+framework = "vite"
+
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+from = "/*"
+to = "/index.html"
+status = 200

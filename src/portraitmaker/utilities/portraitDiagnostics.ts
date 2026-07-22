@@ -83,11 +83,29 @@ type GpuDeviceLike = {
   readonly destroy?: () => void
 }
 
+// Structural stand-ins for the WebGPU types: written for browsers where the
+// API predates TS's lib definitions, and kept structural (unknown fields, all
+// optional) so both the native GPUAdapter/GPUAdapterInfo types and older
+// vendor variants satisfy them.
+type GpuAdapterInfoLike = {
+  readonly vendor?: unknown
+  readonly architecture?: unknown
+  readonly device?: unknown
+  readonly description?: unknown
+}
+
+type GpuLimitsLike = {
+  readonly maxBufferSize?: unknown
+  readonly maxStorageBufferBindingSize?: unknown
+  readonly maxComputeWorkgroupStorageSize?: unknown
+  readonly maxComputeInvocationsPerWorkgroup?: unknown
+}
+
 type GpuAdapterLike = {
-  readonly info?: Record<string, unknown>
-  readonly requestAdapterInfo?: () => Promise<Record<string, unknown>>
+  readonly info?: GpuAdapterInfoLike
+  readonly requestAdapterInfo?: () => Promise<GpuAdapterInfoLike>
   readonly features?: Iterable<string>
-  readonly limits?: Record<string, unknown>
+  readonly limits?: GpuLimitsLike
   readonly requestDevice: () => Promise<GpuDeviceLike>
 }
 
@@ -124,19 +142,16 @@ const readIterable = (value: Iterable<string> | undefined): readonly string[] | 
 // numeric fields; these few are the ones most likely to explain a model that
 // won't initialize on otherwise-WebGPU-capable hardware.
 const readAdapterLimits = (
-  limits: Record<string, unknown> | undefined,
+  limits: GpuLimitsLike | undefined,
 ): Record<string, unknown> | undefined => {
   if (!limits) return undefined
-  const keys = [
-    "maxBufferSize",
-    "maxStorageBufferBindingSize",
-    "maxComputeWorkgroupStorageSize",
-    "maxComputeInvocationsPerWorkgroup",
-  ]
   try {
-    const entries = keys
-      .filter((key) => limits[key] !== undefined)
-      .map((key) => [key, limits[key]] as const)
+    const entries = [
+      ["maxBufferSize", limits.maxBufferSize],
+      ["maxStorageBufferBindingSize", limits.maxStorageBufferBindingSize],
+      ["maxComputeWorkgroupStorageSize", limits.maxComputeWorkgroupStorageSize],
+      ["maxComputeInvocationsPerWorkgroup", limits.maxComputeInvocationsPerWorkgroup],
+    ].filter(([, value]) => value !== undefined)
     return entries.length > 0 ? Object.fromEntries(entries) : undefined
   } catch {
     return undefined

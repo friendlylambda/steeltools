@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { nanoid } from "nanoid"
 import type { Montage } from "../types/montage"
-import { createDefaultDifficultyTable } from "../utils/defaults"
+import { createDefaultDifficultyTable } from "../utilities/defaults"
 
 interface MontageStore {
   readonly montages: Readonly<Record<string, Montage>>
@@ -30,6 +30,7 @@ interface MontageStore {
   ) => void
   readonly deleteMontage: (id: string) => void
   readonly duplicateMontage: (id: string) => string | null
+  readonly importMontage: (montage: Montage) => string
   readonly setCurrentId: (id: string | null) => void
 }
 
@@ -106,6 +107,25 @@ export const useMontageStore = create<MontageStore>()(
         }
         set((state) => ({
           montages: { ...state.montages, [newId]: copy },
+        }))
+        return newId
+      },
+
+      importMontage: (montage) => {
+        const newId = nanoid(8)
+        const now = Date.now()
+        const imported: Montage = {
+          ...montage,
+          id: newId,
+          challenges: montage.challenges.map((challenge) => ({
+            ...challenge,
+            id: nanoid(8),
+          })),
+          createdAt: now,
+          updatedAt: now,
+        }
+        set((state) => ({
+          montages: { ...state.montages, [newId]: imported },
         }))
         return newId
       },

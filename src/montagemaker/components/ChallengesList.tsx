@@ -2,7 +2,7 @@
 import { motion } from "motion/react"
 import { Button } from "@base-ui/react/button"
 import type { Challenge } from "../types/montage"
-import { createDefaultChallenge } from "../utils/defaults"
+import { createDefaultChallenge } from "../utilities/defaults"
 import { ChallengeEditor } from "./ChallengeEditor"
 import { ChallengeSummary } from "./ChallengeSummary"
 import { colors, spacing, radius, typography } from "../../theme"

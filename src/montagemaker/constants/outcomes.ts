@@ -1,3 +1,11 @@
+import type { OutcomesMode } from "../types/montage"
+
+export const OUTCOMES_MODES = [
+  "default",
+  "minimal",
+  "custom",
+] as const satisfies readonly OutcomesMode[]
+
 // Victory button HTML token helper
 const victoryButton = (count: number): string => {
   const label = count === 1 ? "1 Victory" : `${count} Victories`

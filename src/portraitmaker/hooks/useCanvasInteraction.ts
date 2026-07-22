@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react"
 import type { Transform, Arc } from "../types/portrait"
-import { normalizeAngle, pointerToAngle, clampHalfWidth, snapRotation } from "../utils/geometry"
+import { normalizeAngle, pointerToAngle, clampHalfWidth, snapRotation } from "../utilities/geometry"
 
 type DragMode =
   | {
@@ -175,10 +175,7 @@ export const useCanvasInteraction = (
       dragRef.current = {
         kind: "rotate",
         startRotation: transformRef.current.rotation,
-        startPointerAngle: Math.atan2(
-          event.clientY - pivotClientY,
-          event.clientX - pivotClientX,
-        ),
+        startPointerAngle: Math.atan2(event.clientY - pivotClientY, event.clientX - pivotClientX),
         pivotClientX,
         pivotClientY,
       }

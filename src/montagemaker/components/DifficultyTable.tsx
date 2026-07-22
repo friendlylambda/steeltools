@@ -8,6 +8,7 @@ import type {
   Difficulty,
 } from "../types/montage"
 import { colors, spacing, typography } from "../../theme"
+import { DIFFICULTIES, HERO_COUNTS } from "../constants/drawSteel"
 import { Stepper } from "../../components/Stepper"
 import { toggleButtonStyle, toggleGroupStyle } from "./sharedStyles"
 
@@ -67,10 +68,6 @@ const difficultyLabels: Record<Difficulty, string> = {
   hard: "Hard",
 }
 
-const allHeroCounts: readonly HeroCount[] = ["three", "four", "five", "six"]
-const allDifficulties: readonly Difficulty[] = ["easy", "medium", "hard"]
-
-
 export const DifficultyTable = ({
   value,
   onChange,
@@ -79,8 +76,8 @@ export const DifficultyTable = ({
   onDifficultyChange,
   onHeroCountChange,
 }: DifficultyTableProps): React.ReactElement => {
-  const visibleDifficulties = difficulty ? [difficulty] : allDifficulties
-  const visibleHeroCounts = heroCount ? [heroCount] : allHeroCounts
+  const visibleDifficulties = difficulty ? [difficulty] : DIFFICULTIES
+  const visibleHeroCounts = heroCount ? [heroCount] : HERO_COUNTS
 
   const handleCellChange = (
     heroCount: HeroCount,

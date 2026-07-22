@@ -4,7 +4,7 @@ import { Link } from "@tanstack/react-router"
 import { Switch } from "@base-ui/react/switch"
 import { colors, spacing, radius, typography } from "../../theme"
 import { usePortraitState } from "../hooks/usePortraitState"
-import { isModelCached, removeBackground } from "../utils/backgroundRemoval"
+import { isModelCached, removeBackground } from "../utilities/backgroundRemoval"
 import { ImageUploader } from "./ImageUploader"
 import { PortraitCanvas } from "./PortraitCanvas"
 import { ExportButton } from "./ExportButton"
@@ -210,7 +210,10 @@ export const PortraitMaker = (): React.ReactElement => {
             onTransformChange={actions.setTransform}
             onArcChange={actions.setArc}
           />
-          <ExtraPopoutRoomToggle checked={hasExtraPopoutRoom} onCheckedChange={setHasExtraPopoutRoom} />
+          <ExtraPopoutRoomToggle
+            checked={hasExtraPopoutRoom}
+            onCheckedChange={setHasExtraPopoutRoom}
+          />
           <div css={{ display: "flex", gap: spacing.medium, alignItems: "center" }}>
             <ExportButton
               image={state.imageState.image}

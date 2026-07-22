@@ -3,7 +3,7 @@ import { useEffect } from "react"
 import { useParams, useNavigate, Link } from "@tanstack/react-router"
 import { Switch } from "@base-ui/react/switch"
 import { useNegotiationStore } from "../store/negotiationStore"
-import { generateMarkdown } from "../utils/markdown"
+import { generateMarkdown } from "../utilities/markdown"
 import { TitleInput } from "../../components/TitleInput"
 import { RichTextEditor } from "../../components/RichTextEditor"
 import { ExportActions } from "../../components/ExportActions"
@@ -163,11 +163,7 @@ export const Editor = (): React.ReactElement | null => {
         onChange={handleMotivationsChange}
       />
 
-      <TraitsList
-        kind="pitfall"
-        value={negotiation.pitfalls}
-        onChange={handlePitfallsChange}
-      />
+      <TraitsList kind="pitfall" value={negotiation.pitfalls} onChange={handlePitfallsChange} />
 
       <OutcomesTable value={negotiation.outcomes} onChange={handleOutcomesChange} />
 

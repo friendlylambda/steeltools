@@ -9,7 +9,11 @@ interface ExportActionsProps {
   readonly copyLabel: string
   readonly downloadLabel: string
   readonly defaultFilename: string
+  readonly generateShareUrl?: () => Promise<string>
+  readonly shareLabel?: string
 }
+
+type CopiedTarget = "markdown" | "share" | "share-error"
 
 const copyToClipboard = async (text: string): Promise<void> => {
   await navigator.clipboard.writeText(text)
@@ -38,26 +42,48 @@ const buttonStyles = {
   },
 } as const
 
+const tooltipPopupStyles = {
+  backgroundColor: colors.backgroundLight,
+  border: `1px solid ${colors.secondary30}`,
+  borderRadius: radius.medium,
+  padding: `${spacing.medium} ${spacing.large}`,
+  fontSize: typography.fontSize.medium,
+  color: colors.text,
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+  opacity: 1,
+  transform: "translateY(0) scale(1)",
+  transition: "opacity 200ms ease, transform 200ms ease",
+  "&[data-starting-style], &[data-ending-style]": {
+    opacity: 0,
+    transform: "translateY(4px) scale(0.95)",
+  },
+} as const
+
 export const ExportActions = ({
   generateMarkdown,
   copyLabel,
   downloadLabel,
   defaultFilename,
+  generateShareUrl,
+  shareLabel,
 }: ExportActionsProps): React.ReactElement => {
-  const [showCopied, setShowCopied] = useState(false)
+  const [copiedTarget, setCopiedTarget] = useState<CopiedTarget | null>(null)
   const timeoutRef = useRef<number | null>(null)
+
+  const showCopiedTooltip = (target: CopiedTarget): void => {
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current)
+    }
+    setCopiedTarget(target)
+    timeoutRef.current = window.setTimeout(() => {
+      setCopiedTarget(null)
+    }, 2000)
+  }
 
   const handleCopy = (): void => {
     const markdown = generateMarkdown()
     copyToClipboard(markdown)
-
-    if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current)
-    }
-    setShowCopied(true)
-    timeoutRef.current = window.setTimeout(() => {
-      setShowCopied(false)
-    }, 2000)
+    showCopiedTooltip("markdown")
   }
 
   const handleDownload = (): void => {
@@ -65,10 +91,22 @@ export const ExportActions = ({
     downloadFile(markdown, defaultFilename)
   }
 
+  const handleShare = async (): Promise<void> => {
+    if (generateShareUrl) {
+      try {
+        const url = await generateShareUrl()
+        await copyToClipboard(url)
+        showCopiedTooltip("share")
+      } catch {
+        showCopiedTooltip("share-error")
+      }
+    }
+  }
+
   return (
-    <div css={{ display: "flex", gap: spacing.medium }}>
+    <div css={{ display: "flex", gap: spacing.medium, flexWrap: "wrap" }}>
       <Tooltip.Provider>
-        <Tooltip.Root open={showCopied}>
+        <Tooltip.Root open={copiedTarget === "markdown"}>
           <Tooltip.Trigger
             render={
               <Button onClick={handleCopy} css={buttonStyles}>
@@ -78,33 +116,34 @@ export const ExportActions = ({
           />
           <Tooltip.Portal>
             <Tooltip.Positioner side="top" sideOffset={8}>
-              <Tooltip.Popup
-                css={{
-                  backgroundColor: colors.backgroundLight,
-                  border: `1px solid ${colors.secondary30}`,
-                  borderRadius: radius.medium,
-                  padding: `${spacing.medium} ${spacing.large}`,
-                  fontSize: typography.fontSize.medium,
-                  color: colors.text,
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-                  opacity: 1,
-                  transform: "translateY(0) scale(1)",
-                  transition: "opacity 200ms ease, transform 200ms ease",
-                  "&[data-starting-style], &[data-ending-style]": {
-                    opacity: 0,
-                    transform: "translateY(4px) scale(0.95)",
-                  },
-                }}
-              >
-                Copied!
-              </Tooltip.Popup>
+              <Tooltip.Popup css={tooltipPopupStyles}>Copied!</Tooltip.Popup>
             </Tooltip.Positioner>
           </Tooltip.Portal>
         </Tooltip.Root>
+        <Button onClick={handleDownload} css={buttonStyles}>
+          {downloadLabel}
+        </Button>
+        {generateShareUrl && (
+          <Tooltip.Root open={copiedTarget === "share" || copiedTarget === "share-error"}>
+            <Tooltip.Trigger
+              render={
+                <Button onClick={handleShare} css={buttonStyles}>
+                  {shareLabel ?? "Copy Share Link"}
+                </Button>
+              }
+            />
+            <Tooltip.Portal>
+              <Tooltip.Positioner side="top" sideOffset={8}>
+                <Tooltip.Popup css={tooltipPopupStyles}>
+                  {copiedTarget === "share-error"
+                    ? "Sharing failed — please try again"
+                    : "Link copied!"}
+                </Tooltip.Popup>
+              </Tooltip.Positioner>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        )}
       </Tooltip.Provider>
-      <Button onClick={handleDownload} css={buttonStyles}>
-        {downloadLabel}
-      </Button>
     </div>
   )
 }

@@ -15,7 +15,7 @@ import type {
   Challenge,
   OutcomesMode,
 } from "../types/montage"
-import { DEFAULT_OUTCOMES_HTML } from "../constants/outcomes"
+import { DEFAULT_OUTCOMES_HTML, OUTCOMES_MODES } from "../constants/outcomes"
 import { colors, spacing, radius, typography } from "../../theme"
 import { toggleButtonStyle, toggleGroupStyle } from "./sharedStyles"
 
@@ -273,7 +273,7 @@ export const Editor = (): React.ReactElement | null => {
               onValueChange={handleOutcomesModeChange}
               css={toggleGroupStyle}
             >
-              {(["default", "minimal", "custom"] as const).map((val, index, arr) => (
+              {OUTCOMES_MODES.map((val, index, arr) => (
                 <Toggle key={val} value={val} css={toggleButtonStyle(index === arr.length - 1)}>
                   {val.charAt(0).toUpperCase() + val.slice(1)}
                 </Toggle>

@@ -1,12 +1,16 @@
-import type { Characteristic } from "../types/montage"
+import type { Characteristic, Difficulty, HeroCount } from "../types/montage"
 
-export const CHARACTERISTICS: readonly Characteristic[] = [
+export const CHARACTERISTICS = [
   "Might",
   "Agility",
   "Intuition",
   "Reason",
   "Presence",
-]
+] as const satisfies readonly Characteristic[]
+
+export const HERO_COUNTS = ["three", "four", "five", "six"] as const satisfies readonly HeroCount[]
+
+export const DIFFICULTIES = ["easy", "medium", "hard"] as const satisfies readonly Difficulty[]
 
 export const SKILL_CATEGORIES = {
   Crafting: [

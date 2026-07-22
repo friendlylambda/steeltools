@@ -1,14 +1,12 @@
 import dedent from "dedent"
 import type { Montage, HeroCount, Difficulty, Challenge } from "../types/montage"
 import { DEFAULT_OUTCOMES_HTML } from "../constants/outcomes"
-import { htmlToWrappedMarkdown } from "../../utils/codexMarkdown"
+import { DIFFICULTIES, HERO_COUNTS } from "../constants/drawSteel"
+import { htmlToWrappedMarkdown } from "../../utilities/codexMarkdown"
 
 const GM_ONLY_WRAPPER_OPEN = "{"
 
 const detailsToMarkdown = (html: string): string => htmlToWrappedMarkdown(html)
-
-const heroCountOrder: readonly HeroCount[] = ["three", "four", "five", "six"]
-const difficultyOrder: readonly Difficulty[] = ["easy", "medium", "hard"]
 
 const heroCountLabels: Record<HeroCount, string> = {
   three: "Three",
@@ -27,8 +25,8 @@ const generateDashes = (count: number): string => "-".repeat(count)
 
 const generateTable = (montage: Montage): string => {
   const { difficultyTable } = montage
-  const difficulties = montage.difficulty ? [montage.difficulty] : difficultyOrder
-  const heroCounts = montage.heroCount ? [montage.heroCount] : heroCountOrder
+  const difficulties = montage.difficulty ? [montage.difficulty] : DIFFICULTIES
+  const heroCounts = montage.heroCount ? [montage.heroCount] : HERO_COUNTS
 
   // Build header row
   const difficultyHeaders = difficulties
@@ -108,8 +106,8 @@ const generateQueryBlocks = (montage: Montage): string => {
     six: "numheroes > 5",
   }
 
-  const difficulties = montage.difficulty ? [montage.difficulty] : difficultyOrder
-  const heroCounts = montage.heroCount ? [montage.heroCount] : heroCountOrder
+  const difficulties = montage.difficulty ? [montage.difficulty] : DIFFICULTIES
+  const heroCounts = montage.heroCount ? [montage.heroCount] : HERO_COUNTS
 
   const blocks: string[] = []
 

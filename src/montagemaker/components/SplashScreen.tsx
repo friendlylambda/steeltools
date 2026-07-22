@@ -98,15 +98,18 @@ export const SplashScreen = (): React.ReactElement => {
   }
 
   const [shareFeedback, setShareFeedback] = useState<ShareFeedback | null>(null)
+  const [sharingMontageId, setSharingMontageId] = useState<string | null>(null)
   const shareTimeoutRef = useRef<number | null>(null)
 
   const handleShare = async (montage: Montage): Promise<void> => {
+    setSharingMontageId(montage.id)
     const status = await createMontageShareLink(montage)
       .then(async (url) => {
         await navigator.clipboard.writeText(url)
         return "copied" as const
       })
       .catch(() => "error" as const)
+    setSharingMontageId(null)
     if (shareTimeoutRef.current) {
       window.clearTimeout(shareTimeoutRef.current)
     }
@@ -241,8 +244,19 @@ export const SplashScreen = (): React.ReactElement => {
                   <Tooltip.Root open={shareFeedback?.montageId === montage.id}>
                     <Tooltip.Trigger
                       render={
-                        <Button onClick={() => handleShare(montage)} css={rowActionButtonStyles}>
-                          Share
+                        <Button
+                          onClick={() => handleShare(montage)}
+                          disabled={sharingMontageId === montage.id}
+                          css={{
+                            ...rowActionButtonStyles,
+                            "&:disabled": {
+                              opacity: 0.6,
+                              cursor: "default",
+                              borderColor: colors.secondary30,
+                            },
+                          }}
+                        >
+                          {sharingMontageId === montage.id ? "Sharing…" : "Share"}
                         </Button>
                       }
                     />

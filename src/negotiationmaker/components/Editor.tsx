@@ -226,14 +226,17 @@ export const Editor = (): React.ReactElement | null => {
       </section>
 
       <ExportActions
-        generateMarkdown={() => generateMarkdown(negotiation)}
-        copyLabel="Copy Negotiation Markdown to Clipboard"
-        downloadLabel="Download Negotiation Markdown as a File"
-        defaultFilename={
-          negotiation.title
-            ? `${negotiation.title.toLowerCase().replace(/\s+/g, "-")}.md`
-            : "negotiation.md"
-        }
+        exports={[
+          {
+            generateContent: () => generateMarkdown(negotiation),
+            mimeType: "text/markdown",
+            copyLabel: "Copy Negotiation Markdown to Clipboard",
+            downloadLabel: "Download Negotiation Markdown as a File",
+            filename: negotiation.title
+              ? `${negotiation.title.toLowerCase().replace(/\s+/g, "-")}.md`
+              : "negotiation.md",
+          },
+        ]}
       />
     </div>
   )

@@ -9,6 +9,7 @@
     "dev:vite": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-use": "^17.6.1",
+    "vitest": "^4.1.11",
     "zod": "^4.4.3",
     "zustand": "^5.0.14"
   },

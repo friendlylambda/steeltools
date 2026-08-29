@@ -89,6 +89,17 @@ const splitIntoSections = (html: string): readonly ContentSection[] => {
 }
 
 /**
+ * Convert HTML with hidden blocks to plain markdown, with no Codex wrappers.
+ * For destinations that have nowhere to hide content, such as a JSON export:
+ * hidden text stays in place, separated from its neighbours by a blank line
+ * rather than running straight into them.
+ */
+export const htmlToPlainMarkdown = (html: string): string =>
+  splitIntoSections(html)
+    .map((section) => section.content)
+    .join("\n\n")
+
+/**
  * Convert HTML with hidden blocks to wrapped markdown sections.
  * Visible content is wrapped in {! }, hidden content in { }.
  * The newlines must be present after the opening brace or Codex will display

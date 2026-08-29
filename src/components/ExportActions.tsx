@@ -1,26 +1,27 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useRef } from "react"
+import { Fragment, useState, useRef } from "react"
 import { Button } from "@base-ui/react/button"
 import { Tooltip } from "@base-ui/react/tooltip"
 import { colors, spacing, radius, typography } from "../theme"
 
-interface ExportActionsProps {
-  readonly generateMarkdown: () => string
+// One format a document can be exported as — the montage maker offers both
+// Codex markdown and Codex module JSON, the negotiation maker only markdown.
+export interface ExportTarget {
+  readonly generateContent: () => string
+  readonly mimeType: string
   readonly copyLabel: string
   readonly downloadLabel: string
-  readonly defaultFilename: string
+  readonly filename: string
+}
+
+interface ExportActionsProps {
+  readonly exports: readonly ExportTarget[]
   readonly generateShareUrl?: () => Promise<string>
   readonly shareLabel?: string
 }
 
-type CopiedTarget = "markdown" | "share" | "share-error"
-
-const copyToClipboard = async (text: string): Promise<void> => {
-  await navigator.clipboard.writeText(text)
-}
-
-const downloadFile = (content: string, filename: string): void => {
-  const blob = new Blob([content], { type: "text/markdown" })
+const downloadFile = (content: string, filename: string, mimeType: string): void => {
+  const blob = new Blob([content], { type: mimeType })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement("a")
   anchor.href = url
@@ -59,89 +60,100 @@ const tooltipPopupStyles = {
   },
 } as const
 
-export const ExportActions = ({
-  generateMarkdown,
-  copyLabel,
-  downloadLabel,
-  defaultFilename,
-  generateShareUrl,
-  shareLabel,
-}: ExportActionsProps): React.ReactElement => {
-  const [copiedTarget, setCopiedTarget] = useState<CopiedTarget | null>(null)
+type CopyOutcome = "copied" | "failed"
+
+interface CopyButtonProps {
+  readonly label: string
+  // Produces the text to put on the clipboard: export content, or a share link
+  // that has to be created first.
+  readonly copy: () => string | Promise<string>
+  readonly copiedMessage: string
+  readonly failedMessage: string
+}
+
+// Owns its own confirmation tooltip, so nothing outside has to track which
+// button was last clicked.
+const CopyButton = ({
+  label,
+  copy,
+  copiedMessage,
+  failedMessage,
+}: CopyButtonProps): React.ReactElement => {
+  const [outcome, setOutcome] = useState<CopyOutcome | null>(null)
   const timeoutRef = useRef<number | null>(null)
 
-  const showCopiedTooltip = (target: CopiedTarget): void => {
+  const showOutcome = (newOutcome: CopyOutcome): void => {
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current)
     }
-    setCopiedTarget(target)
+    setOutcome(newOutcome)
     timeoutRef.current = window.setTimeout(() => {
-      setCopiedTarget(null)
+      setOutcome(null)
     }, 2000)
   }
 
-  const handleCopy = (): void => {
-    const markdown = generateMarkdown()
-    copyToClipboard(markdown)
-    showCopiedTooltip("markdown")
-  }
-
-  const handleDownload = (): void => {
-    const markdown = generateMarkdown()
-    downloadFile(markdown, defaultFilename)
-  }
-
-  const handleShare = async (): Promise<void> => {
-    if (generateShareUrl) {
-      try {
-        const url = await generateShareUrl()
-        await copyToClipboard(url)
-        showCopiedTooltip("share")
-      } catch {
-        showCopiedTooltip("share-error")
-      }
+  const handleClick = async (): Promise<void> => {
+    try {
+      const text = await copy()
+      await navigator.clipboard.writeText(text)
+      showOutcome("copied")
+    } catch {
+      showOutcome("failed")
     }
+  }
+
+  return (
+    <Tooltip.Root open={outcome !== null}>
+      <Tooltip.Trigger
+        render={
+          <Button onClick={handleClick} css={buttonStyles}>
+            {label}
+          </Button>
+        }
+      />
+      <Tooltip.Portal>
+        <Tooltip.Positioner side="top" sideOffset={8}>
+          <Tooltip.Popup css={tooltipPopupStyles}>
+            {outcome === "copied" ? copiedMessage : failedMessage}
+          </Tooltip.Popup>
+        </Tooltip.Positioner>
+      </Tooltip.Portal>
+    </Tooltip.Root>
+  )
+}
+
+export const ExportActions = ({
+  exports,
+  generateShareUrl,
+  shareLabel,
+}: ExportActionsProps): React.ReactElement => {
+  const handleDownload = (exportTarget: ExportTarget): void => {
+    downloadFile(exportTarget.generateContent(), exportTarget.filename, exportTarget.mimeType)
   }
 
   return (
     <div css={{ display: "flex", gap: spacing.medium, flexWrap: "wrap" }}>
       <Tooltip.Provider>
-        <Tooltip.Root open={copiedTarget === "markdown"}>
-          <Tooltip.Trigger
-            render={
-              <Button onClick={handleCopy} css={buttonStyles}>
-                {copyLabel}
-              </Button>
-            }
-          />
-          <Tooltip.Portal>
-            <Tooltip.Positioner side="top" sideOffset={8}>
-              <Tooltip.Popup css={tooltipPopupStyles}>Copied!</Tooltip.Popup>
-            </Tooltip.Positioner>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-        <Button onClick={handleDownload} css={buttonStyles}>
-          {downloadLabel}
-        </Button>
-        {generateShareUrl && (
-          <Tooltip.Root open={copiedTarget === "share" || copiedTarget === "share-error"}>
-            <Tooltip.Trigger
-              render={
-                <Button onClick={handleShare} css={buttonStyles}>
-                  {shareLabel ?? "Copy Share Link"}
-                </Button>
-              }
+        {exports.map((exportTarget) => (
+          <Fragment key={exportTarget.copyLabel}>
+            <CopyButton
+              label={exportTarget.copyLabel}
+              copy={exportTarget.generateContent}
+              copiedMessage="Copied!"
+              failedMessage="Copying failed — please try again"
             />
-            <Tooltip.Portal>
-              <Tooltip.Positioner side="top" sideOffset={8}>
-                <Tooltip.Popup css={tooltipPopupStyles}>
-                  {copiedTarget === "share-error"
-                    ? "Sharing failed — please try again"
-                    : "Link copied!"}
-                </Tooltip.Popup>
-              </Tooltip.Positioner>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+            <Button onClick={() => handleDownload(exportTarget)} css={buttonStyles}>
+              {exportTarget.downloadLabel}
+            </Button>
+          </Fragment>
+        ))}
+        {generateShareUrl && (
+          <CopyButton
+            label={shareLabel ?? "Copy Share Link"}
+            copy={generateShareUrl}
+            copiedMessage="Link copied!"
+            failedMessage="Sharing failed — please try again"
+          />
         )}
       </Tooltip.Provider>
     </div>

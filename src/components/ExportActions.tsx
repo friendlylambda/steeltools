@@ -12,6 +12,9 @@ export interface ExportTarget {
   readonly copyLabel: string
   readonly downloadLabel: string
   readonly filename: string
+  // Optional explanation for the format, shown above this target's buttons and
+  // separated from the exports before it by a rule.
+  readonly note?: React.ReactNode
 }
 
 interface ExportActionsProps {
@@ -136,6 +139,20 @@ export const ExportActions = ({
       <Tooltip.Provider>
         {exports.map((exportTarget) => (
           <Fragment key={exportTarget.copyLabel}>
+            {exportTarget.note && (
+              // Full width so it breaks the button row and heads its own section.
+              <div
+                css={{
+                  width: "100%",
+                  borderTop: `1px solid ${colors.secondary30}`,
+                  paddingTop: spacing.medium,
+                  fontSize: typography.fontSize.small,
+                  color: colors.textDim,
+                }}
+              >
+                {exportTarget.note}
+              </div>
+            )}
             <CopyButton
               label={exportTarget.copyLabel}
               copy={exportTarget.generateContent}

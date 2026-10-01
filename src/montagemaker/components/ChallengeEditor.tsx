@@ -6,8 +6,8 @@ import { Input } from "@base-ui/react/input"
 import { Combobox } from "@base-ui/react/combobox"
 import { Dialog } from "@base-ui/react/dialog"
 import { Switch } from "@base-ui/react/switch"
-import type { Challenge, Characteristic, Difficulty } from "../types/montage"
-import { CHARACTERISTICS, SKILLS } from "../constants/drawSteel"
+import type { Challenge, Characteristic, Difficulty, TierResults } from "../types/montage"
+import { CHARACTERISTICS, DEFAULT_TIER_RESULTS, SKILLS } from "../constants/drawSteel"
 import { colors, spacing, radius, typography } from "../../theme"
 import { Stepper } from "../../components/Stepper"
 
@@ -56,6 +56,93 @@ interface ChallengeEditorProps {
   readonly value: Challenge
   readonly onChange: (challenge: Challenge) => void
   readonly onDelete: () => void
+  readonly includeRollButtons: boolean
+}
+
+// Draw Steel's power roll tiers, plus the optional critical on a natural 19 or 20
+const TIER_FIELDS: readonly { readonly key: keyof TierResults; readonly label: string }[] = [
+  { key: "tier1", label: "11 or lower" },
+  { key: "tier2", label: "12–16" },
+  { key: "tier3", label: "17+" },
+  { key: "critical", label: "Natural 19–20" },
+]
+
+interface TierResultsEditorProps {
+  readonly value: TierResults
+  readonly difficulty: Difficulty
+  readonly onChange: (tierResults: TierResults) => void
+  readonly onReset: () => void
+}
+
+const TierResultsEditor = ({
+  value,
+  difficulty,
+  onChange,
+  onReset,
+}: TierResultsEditorProps): React.ReactElement => {
+  const [localValue, setLocalValue] = useState(value)
+
+  // Sync local state when prop changes from external source
+  useEffect(() => {
+    setLocalValue(value)
+  }, [value])
+
+  useDebounce(
+    () => {
+      if (localValue !== value) {
+        onChange(localValue)
+      }
+    },
+    300,
+    [localValue],
+  )
+
+  return (
+    <>
+      <div css={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <label css={labelStyle}>Roll Results</label>
+        <button
+          type="button"
+          onClick={onReset}
+          css={addFieldButtonStyle}
+          title="Remove the custom results and use the standard ones for this difficulty"
+        >
+          Use Standard Results
+        </button>
+      </div>
+      <div
+        css={{
+          display: "grid",
+          gridTemplateColumns: "auto 1fr",
+          alignItems: "center",
+          gap: spacing.small,
+          marginTop: spacing.xsmall,
+        }}
+      >
+        {TIER_FIELDS.map((field) => (
+          <label key={field.key} css={{ display: "contents" }}>
+            <span
+              css={{
+                fontSize: typography.fontSize.small,
+                color: colors.textDim,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {field.label}
+            </span>
+            <Input
+              value={localValue[field.key]}
+              onChange={(event) =>
+                setLocalValue({ ...localValue, [field.key]: event.target.value })
+              }
+              placeholder={DEFAULT_TIER_RESULTS[difficulty][field.key] || "Optional"}
+              css={inputStyle}
+            />
+          </label>
+        ))}
+      </div>
+    </>
+  )
 }
 
 interface CharacteristicChipProps {
@@ -158,6 +245,7 @@ export const ChallengeEditor = ({
   value,
   onChange,
   onDelete,
+  includeRollButtons,
 }: ChallengeEditorProps): React.ReactElement => {
   const [localName, setLocalName] = useState(value.name)
   const [localDescription, setLocalDescription] = useState(value.description)
@@ -225,6 +313,12 @@ export const ChallengeEditor = ({
     300,
     [localConsequences],
   )
+
+  const tierResults = includeRollButtons ? value.tierResults : null
+  const canAddExtraDetails = value.extraDetails == null
+  const canAddConsequences = value.consequences == null
+  const canAddTierResults = includeRollButtons && value.tierResults == null
+  const showAddButtons = canAddExtraDetails || canAddConsequences || canAddTierResults
 
   const filteredSkills = SKILLS.filter((skill) =>
     skill.toLowerCase().includes(skillInputValue.toLowerCase()),
@@ -671,8 +765,7 @@ export const ChallengeEditor = ({
         css={{
           display: "flex",
           gap: spacing.large,
-          marginBottom:
-            value.extraDetails == null || value.consequences == null ? spacing.medium : 0,
+          marginBottom: showAddButtons || tierResults ? spacing.medium : 0,
         }}
       >
         <div>
@@ -700,10 +793,22 @@ export const ChallengeEditor = ({
         </div>
       </div>
 
+      {/* Roll Results (only shown once enabled, and only while roll buttons are exported) */}
+      {tierResults && (
+        <div css={{ marginBottom: showAddButtons ? spacing.medium : 0 }}>
+          <TierResultsEditor
+            value={tierResults}
+            difficulty={value.difficulty}
+            onChange={(updated) => onChange({ ...value, tierResults: updated })}
+            onReset={() => onChange({ ...value, tierResults: null })}
+          />
+        </div>
+      )}
+
       {/* Buttons to add optional fields */}
-      {(value.extraDetails == null || value.consequences == null) && (
+      {showAddButtons && (
         <div css={{ display: "flex", justifyContent: "flex-end", gap: spacing.small }}>
-          {value.extraDetails == null && (
+          {canAddExtraDetails && (
             <button
               type="button"
               onClick={() => onChange({ ...value, extraDetails: "" })}
@@ -712,13 +817,24 @@ export const ChallengeEditor = ({
               +Details
             </button>
           )}
-          {value.consequences == null && (
+          {canAddConsequences && (
             <button
               type="button"
               onClick={() => onChange({ ...value, consequences: "" })}
               css={addFieldButtonStyle}
             >
               +Consequences
+            </button>
+          )}
+          {canAddTierResults && (
+            <button
+              type="button"
+              onClick={() =>
+                onChange({ ...value, tierResults: DEFAULT_TIER_RESULTS[value.difficulty] })
+              }
+              css={addFieldButtonStyle}
+            >
+              +Roll Results
             </button>
           )}
         </div>

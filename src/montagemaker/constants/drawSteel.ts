@@ -1,4 +1,4 @@
-import type { Characteristic, Difficulty, HeroCount } from "../types/montage"
+import type { Characteristic, Difficulty, HeroCount, TierResults } from "../types/montage"
 
 export const CHARACTERISTICS = [
   "Might",
@@ -11,6 +11,30 @@ export const CHARACTERISTICS = [
 export const HERO_COUNTS = ["three", "four", "five", "six"] as const satisfies readonly HeroCount[]
 
 export const DIFFICULTIES = ["easy", "medium", "hard"] as const satisfies readonly Difficulty[]
+
+// Verbatim from the Codex's hardwired power tables (g_hardwiredPowerTableList in
+// DocumentSystem/MarkdownDocument.lua), which a roll button gets when it names a
+// difficulty instead of spelling out its tiers.
+export const DEFAULT_TIER_RESULTS: Readonly<Record<Difficulty, TierResults>> = {
+  easy: {
+    tier1: "You succeed on the task and incur a consequence.",
+    tier2: "You succeed on the task.",
+    tier3: "You succeed on the task with a reward.",
+    critical: "",
+  },
+  medium: {
+    tier1: "You fail the task.",
+    tier2: "You succeed on the task and incur a consequence.",
+    tier3: "You succeed on the task.",
+    critical: "",
+  },
+  hard: {
+    tier1: "You fail the task and incur a consequence.",
+    tier2: "You fail the task.",
+    tier3: "You succeed on the task.",
+    critical: "",
+  },
+}
 
 export const SKILL_CATEGORIES = {
   Crafting: [

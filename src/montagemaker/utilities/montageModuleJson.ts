@@ -8,6 +8,8 @@ const README_LINES: readonly string[] = [
   "Paste one montage. Keys starting with _ are ignored.",
   "rules: baseline | to",
   "characteristics and skills: display names or ids. Unknown entries are skipped.",
+  "successLadder: total_success | partial_success | total_failure",
+  "successLadderShown: whether the table reads the ladder.",
   "difficulty: easy | medium | hard",
 ]
 
@@ -68,7 +70,8 @@ const buildSettings = (montage: Montage): MontageModuleSettings => {
 
 // Challenge text is already plain, unlike the montage's rich text details.
 // Extra details, consequences, and the hidden flag have no slot in the module's
-// format and are left out.
+// format and are left out. So do custom tier results: the module derives each
+// tier's text and outcome from the difficulty alone.
 const buildChallenge = (challenge: Challenge): MontageModuleChallenge => ({
   name: challenge.name,
   description: challenge.description,

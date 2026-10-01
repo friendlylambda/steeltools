@@ -58,9 +58,14 @@ const reorderButtonStyle = {
 interface ChallengesListProps {
   readonly value: readonly Challenge[]
   readonly onChange: (challenges: readonly Challenge[]) => void
+  readonly includeRollButtons: boolean
 }
 
-export const ChallengesList = ({ value, onChange }: ChallengesListProps): React.ReactElement => {
+export const ChallengesList = ({
+  value,
+  onChange,
+  includeRollButtons,
+}: ChallengesListProps): React.ReactElement => {
   const handleAddChallenge = (): void => {
     onChange([...value, createDefaultChallenge()])
   }
@@ -150,6 +155,7 @@ export const ChallengesList = ({ value, onChange }: ChallengesListProps): React.
               value={challenge}
               onChange={(updated) => handleUpdateChallenge(index, updated)}
               onDelete={() => handleDeleteChallenge(index)}
+              includeRollButtons={includeRollButtons}
             />
           </div>
         </motion.div>

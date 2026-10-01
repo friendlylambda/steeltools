@@ -155,7 +155,11 @@ export const Editor = (): React.ReactElement | null => {
         onHeroCountChange={(heroCount) => updateMontage(montageId, { heroCount })}
       />
 
-      <ChallengesList value={montage.challenges} onChange={handleChallengesChange} />
+      <ChallengesList
+        value={montage.challenges}
+        onChange={handleChallengesChange}
+        includeRollButtons={montage.includeRollButtons ?? false}
+      />
 
       <section css={{ marginBottom: spacing.large }}>
         <h3

@@ -1,7 +1,7 @@
 import dedent from "dedent"
 import type { Montage, HeroCount, Difficulty, Challenge } from "../types/montage"
 import { DEFAULT_OUTCOMES_HTML } from "../constants/outcomes"
-import { DIFFICULTIES, HERO_COUNTS } from "../constants/drawSteel"
+import { DEFAULT_TIER_RESULTS, DIFFICULTIES, HERO_COUNTS } from "../constants/drawSteel"
 import { htmlToWrappedMarkdown } from "../../utilities/codexMarkdown"
 
 const GM_ONLY_WRAPPER_OPEN = "{"
@@ -130,6 +130,60 @@ const generateQueryBlocks = (montage: Montage): string => {
   return blocks.join("\n")
 }
 
+// A Codex power roll line can't hold a pipe or a line break: either one splits
+// the roll apart.
+const toPowerRollText = (text: string): string => text.replace(/\s*[|\r\n][|\s]*/g, " ").trim()
+
+// Rider keywords from the Codex's TestRiders.lua. A line after the three tiers
+// that opens with one of these becomes an edge, bane, or requirement rather
+// than the critical result, so its colon is swapped out.
+const RIDER_PATTERN =
+  /^(allow|allowed|require|requires|required|edge|double\s+edge|bane|double\s+bane)\s*:/i
+
+const toCriticalText = (text: string): string => {
+  const cleaned = toPowerRollText(text)
+  if (RIDER_PATTERN.test(cleaned)) {
+    return cleaned.replace(/\s*:/, " -")
+  } else {
+    return cleaned
+  }
+}
+
+// A "|Name: Test" header followed by a preset line ("|Medium") gets the Codex's
+// stock results for that difficulty and a clickable difficulty label. Custom
+// results replace the preset with one line per tier, so the name carries the
+// difficulty instead. Blank tiers fall back to the stock text so the roll never
+// resolves against an empty row.
+const generateRollLines = (challenge: Challenge, test: string): readonly string[] => {
+  const { tierResults } = challenge
+  const difficultyLabel = difficultyLabels[challenge.difficulty]
+  if (tierResults) {
+    const defaults = DEFAULT_TIER_RESULTS[challenge.difficulty]
+    const tiers = (["tier1", "tier2", "tier3"] as const).map(
+      (key) => toPowerRollText(tierResults[key]) || defaults[key],
+    )
+    const critical = toCriticalText(tierResults.critical)
+    const header = `${toPowerRollText(challenge.name)} (${difficultyLabel}): ${test}`
+    return critical ? [header, ...tiers, critical] : [header, ...tiers]
+  } else {
+    return [`${toPowerRollText(challenge.name)}: ${test}`, difficultyLabel]
+  }
+}
+
+// The Codex scans the text after the header's colon for characteristic and
+// skill names to decide what the hero rolls. A challenge suggesting neither has
+// nothing to roll, so it gets no button.
+const generateRollButton = (challenge: Challenge, chars: string, skills: string): string | null => {
+  const test = chars && skills ? `${chars} (${skills})` : chars || skills
+
+  if (test) {
+    const lines = generateRollLines(challenge, test)
+    return ["{", ...lines.map((line) => `|${line}`), "}"].join("\n")
+  } else {
+    return null
+  }
+}
+
 const generateChallenge = (challenge: Challenge, includeRollButtons: boolean): string => {
   const chars = challenge.suggestedCharacteristics.join(" or ")
   const skills = challenge.suggestedSkills.join(" or ")
@@ -165,26 +219,13 @@ const generateChallenge = (challenge: Challenge, includeRollButtons: boolean): s
 
   const withConsequences = consequencesBlock ? `${base}\n${consequencesBlock}` : base
 
-  if (!includeRollButtons) {
+  const rollButton = includeRollButtons ? generateRollButton(challenge, chars, skills) : null
+
+  if (rollButton) {
+    return `${withConsequences}\n${rollButton}`
+  } else {
     return withConsequences
   }
-
-  // Build roll button label: "{name}: {chars} ({skills})"
-  const rollParts = [challenge.name]
-  if (chars) {
-    rollParts.push(`: ${chars}`)
-  }
-  const rollLabel = rollParts.join("")
-  const skillsSuffix = skills ? ` (${skills})` : ""
-
-  const difficultyKeyword = difficultyLabels[challenge.difficulty]
-
-  return dedent`
-    ${withConsequences}
-    {
-    |${rollLabel}${skillsSuffix}
-    |${difficultyKeyword}
-    }`
 }
 
 const generateChallenges = (montage: Montage): string => {

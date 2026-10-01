@@ -44,6 +44,15 @@ const challengeSchema: z.ZodType<Challenge> = z
       .transform((value) => Math.max(1, Math.round(value)))
       .catch(challengeFallback.timesCompletable),
     hidden: z.boolean().catch(challengeFallback.hidden),
+    tierResults: z
+      .object({
+        tier1: z.string(),
+        tier2: z.string(),
+        tier3: z.string(),
+        critical: z.string().catch(""),
+      })
+      .nullable()
+      .catch(null),
   })
   .transform((challenge) => ({ ...challenge, id: nanoid(8) }))
 

@@ -12,6 +12,7 @@ export const createDefaultChallenge = (): Challenge => ({
   consequences: null,
   timesCompletable: 1,
   hidden: false,
+  tierResults: null,
 })
 
 export const createDefaultDifficultyTable = (): DifficultyTable => ({

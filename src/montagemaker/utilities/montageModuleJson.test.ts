@@ -36,6 +36,8 @@ describe("buildMontageModuleDocument", () => {
       "Paste one montage. Keys starting with _ are ignored.",
       "rules: baseline | to",
       "characteristics and skills: display names or ids. Unknown entries are skipped.",
+      "successLadder: total_success | partial_success | total_failure",
+      "successLadderShown: whether the table reads the ladder.",
       "difficulty: easy | medium | hard",
     ])
   })
@@ -208,6 +210,12 @@ describe("buildMontageModuleDocument", () => {
               extraDetails: "Costs an hour of daylight.",
               consequences: "The raiders arrive early.",
               hidden: true,
+              tierResults: {
+                tier1: "Swept downstream.",
+                tier2: "Across, but soaked.",
+                tier3: "Across cleanly.",
+                critical: "",
+              },
             }),
           ],
         }),
@@ -297,6 +305,8 @@ describe("generateMontageModuleJson", () => {
         "Paste one montage. Keys starting with _ are ignored.",
         "rules: baseline | to",
         "characteristics and skills: display names or ids. Unknown entries are skipped.",
+        "successLadder: total_success | partial_success | total_failure",
+        "successLadderShown: whether the table reads the ladder.",
         "difficulty: easy | medium | hard",
       ],
       name: "Crossing the Desert",

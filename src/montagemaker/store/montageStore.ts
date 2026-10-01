@@ -4,6 +4,22 @@ import { nanoid } from "nanoid"
 import type { Montage } from "../types/montage"
 import { createDefaultDifficultyTable } from "../utilities/defaults"
 
+// Rewrites every challenge in every persisted montage, for migrations that add
+// or normalize a challenge field. Each migration names the old fields it reads.
+const migrateChallenges = <PersistedChallenge extends object>(
+  montages: Record<string, unknown>,
+  migrateChallenge: (challenge: PersistedChallenge) => object,
+): Record<string, unknown> =>
+  Object.fromEntries(
+    Object.entries(montages).map(([id, montage]) => {
+      const typedMontage = montage as { challenges?: PersistedChallenge[] }
+      return [
+        id,
+        { ...typedMontage, challenges: (typedMontage.challenges ?? []).map(migrateChallenge) },
+      ]
+    }),
+  )
+
 interface MontageStore {
   readonly montages: Readonly<Record<string, Montage>>
   readonly currentId: string | null
@@ -146,30 +162,22 @@ export const useMontageStore = create<MontageStore>()(
     }),
     {
       name: "montagemaker-store",
-      version: 5,
+      version: 6,
       migrate: (persistedState, version) => {
         let state = persistedState as { montages: Record<string, unknown> }
 
         if (version === 0) {
           // Normalize challenges: add timesCompletable if missing
-          const normalizedMontages = Object.fromEntries(
-            Object.entries(state.montages).map(([id, montage]) => {
-              const typedMontage = montage as {
-                challenges?: Array<{ timesCompletable?: number }>
-              }
-              return [
-                id,
-                {
-                  ...typedMontage,
-                  challenges: (typedMontage.challenges ?? []).map((challenge) => ({
-                    ...challenge,
-                    timesCompletable: challenge.timesCompletable ?? 1,
-                  })),
-                },
-              ]
-            }),
-          )
-          state = { ...state, montages: normalizedMontages }
+          state = {
+            ...state,
+            montages: migrateChallenges(
+              state.montages,
+              (challenge: { timesCompletable?: number }) => ({
+                ...challenge,
+                timesCompletable: challenge.timesCompletable ?? 1,
+              }),
+            ),
+          }
         }
 
         if (version < 2) {
@@ -192,24 +200,13 @@ export const useMontageStore = create<MontageStore>()(
 
         if (version < 3) {
           // Add hidden field to challenges
-          const migratedMontages = Object.fromEntries(
-            Object.entries(state.montages).map(([id, montage]) => {
-              const typedMontage = montage as {
-                challenges?: Array<{ hidden?: boolean }>
-              }
-              return [
-                id,
-                {
-                  ...typedMontage,
-                  challenges: (typedMontage.challenges ?? []).map((challenge) => ({
-                    ...challenge,
-                    hidden: challenge.hidden ?? false,
-                  })),
-                },
-              ]
-            }),
-          )
-          state = { ...state, montages: migratedMontages }
+          state = {
+            ...state,
+            montages: migrateChallenges(state.montages, (challenge: { hidden?: boolean }) => ({
+              ...challenge,
+              hidden: challenge.hidden ?? false,
+            })),
+          }
         }
 
         if (version < 4) {
@@ -228,24 +225,27 @@ export const useMontageStore = create<MontageStore>()(
         }
 
         if (version < 5) {
-          const migratedMontages = Object.fromEntries(
-            Object.entries(state.montages).map(([id, montage]) => {
-              const typedMontage = montage as {
-                challenges?: Array<{ consequences?: string | null }>
-              }
-              return [
-                id,
-                {
-                  ...typedMontage,
-                  challenges: (typedMontage.challenges ?? []).map((challenge) => ({
-                    ...challenge,
-                    consequences: challenge.consequences ?? null,
-                  })),
-                },
-              ]
-            }),
-          )
-          state = { ...state, montages: migratedMontages }
+          state = {
+            ...state,
+            montages: migrateChallenges(
+              state.montages,
+              (challenge: { consequences?: string | null }) => ({
+                ...challenge,
+                consequences: challenge.consequences ?? null,
+              }),
+            ),
+          }
+        }
+
+        if (version < 6) {
+          // Add custom tier results to challenges
+          state = {
+            ...state,
+            montages: migrateChallenges(state.montages, (challenge: { tierResults?: unknown }) => ({
+              ...challenge,
+              tierResults: challenge.tierResults ?? null,
+            })),
+          }
         }
 
         return state

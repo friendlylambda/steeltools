@@ -100,6 +100,17 @@ export const htmlToPlainMarkdown = (html: string): string =>
     .join("\n\n")
 
 /**
+ * Convert HTML with hidden blocks to plain markdown, dropping the hidden
+ * blocks. For destinations that show everything to the players, so content
+ * meant for the Director alone has to stay out.
+ */
+export const htmlToVisibleMarkdown = (html: string): string =>
+  splitIntoSections(html)
+    .filter((section) => !section.isHidden)
+    .map((section) => section.content)
+    .join("\n\n")
+
+/**
  * Convert HTML with hidden blocks to wrapped markdown sections.
  * Visible content is wrapped in {! }, hidden content in { }.
  * The newlines must be present after the opening brace or Codex will display

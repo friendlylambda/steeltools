@@ -3,13 +3,12 @@ import { useEffect } from "react"
 import { useParams, useNavigate, Link } from "@tanstack/react-router"
 import { Switch } from "@base-ui/react/switch"
 import { useNegotiationStore } from "../store/negotiationStore"
-import { generateMarkdown } from "../utilities/markdown"
 import { TitleInput } from "../../components/TitleInput"
 import { RichTextEditor } from "../../components/RichTextEditor"
-import { ExportActions } from "../../components/ExportActions"
 import { NpcStatsSection } from "./NpcStatsSection"
 import { TraitsList } from "./TraitsList"
 import { OutcomesTable } from "./OutcomesTable"
+import { ExportActions } from "./ExportActions"
 import type { Trait, OutcomeRow } from "../types/negotiation"
 import { colors, spacing, radius, typography } from "../../theme"
 
@@ -225,19 +224,7 @@ export const Editor = (): React.ReactElement | null => {
         </label>
       </section>
 
-      <ExportActions
-        exports={[
-          {
-            generateContent: () => generateMarkdown(negotiation),
-            mimeType: "text/markdown",
-            copyLabel: "Copy Negotiation Markdown to Clipboard",
-            downloadLabel: "Download Negotiation Markdown as a File",
-            filename: negotiation.title
-              ? `${negotiation.title.toLowerCase().replace(/\s+/g, "-")}.md`
-              : "negotiation.md",
-          },
-        ]}
-      />
+      <ExportActions negotiation={negotiation} />
     </div>
   )
 }
